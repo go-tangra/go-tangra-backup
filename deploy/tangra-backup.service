@@ -29,8 +29,8 @@ Environment=BACKUP_SERVER_CERT_PATH=/etc/tangra-backup/certs/server.crt
 Environment=BACKUP_SERVER_KEY_PATH=/etc/tangra-backup/certs/server.key
 
 # mTLS client certs (for calling modules)
-Environment=BACKUP_CLIENT_CERT_PATH=/etc/tangra-backup/certs/client.crt
-Environment=BACKUP_CLIENT_KEY_PATH=/etc/tangra-backup/certs/client.key
+Environment=BACKUP_CLIENT_CERT_PATH=/etc/tangra-backup/certs/backup.crt
+Environment=BACKUP_CLIENT_KEY_PATH=/etc/tangra-backup/certs/backup.key
 
 # Security hardening
 NoNewPrivileges=true
