@@ -129,6 +129,7 @@ type CreateModuleBackupRequest struct {
 	TenantId       *uint32                `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"` // 0 = full cross-tenant (platform admin only)
 	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	IncludeSecrets bool                   `protobuf:"varint,4,opt,name=include_secrets,json=includeSecrets,proto3" json:"include_secrets,omitempty"` // include Vault passwords in export
+	Password       string                 `protobuf:"bytes,5,opt,name=password,proto3" json:"password,omitempty"`                                    // if set, backup is AES-256-GCM encrypted
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -191,6 +192,13 @@ func (x *CreateModuleBackupRequest) GetIncludeSecrets() bool {
 	return false
 }
 
+func (x *CreateModuleBackupRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
 type BackupInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -205,6 +213,7 @@ type BackupInfo struct {
 	CreatedBy     string                 `protobuf:"bytes,10,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
 	Version       string                 `protobuf:"bytes,11,opt,name=version,proto3" json:"version,omitempty"`
 	Warnings      []string               `protobuf:"bytes,12,rep,name=warnings,proto3" json:"warnings,omitempty"`
+	Encrypted     bool                   `protobuf:"varint,13,opt,name=encrypted,proto3" json:"encrypted,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -323,6 +332,13 @@ func (x *BackupInfo) GetWarnings() []string {
 	return nil
 }
 
+func (x *BackupInfo) GetEncrypted() bool {
+	if x != nil {
+		return x.Encrypted
+	}
+	return false
+}
+
 type CreateModuleBackupResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Backup        *BackupInfo            `protobuf:"bytes,1,opt,name=backup,proto3" json:"backup,omitempty"`
@@ -373,6 +389,7 @@ type RestoreModuleBackupRequest struct {
 	BackupId      string                 `protobuf:"bytes,1,opt,name=backup_id,json=backupId,proto3" json:"backup_id,omitempty"`
 	Target        *ModuleTarget          `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
 	Mode          RestoreMode            `protobuf:"varint,3,opt,name=mode,proto3,enum=backup.service.v1.RestoreMode" json:"mode,omitempty"`
+	Password      string                 `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"` // required if backup is encrypted
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -426,6 +443,13 @@ func (x *RestoreModuleBackupRequest) GetMode() RestoreMode {
 		return x.Mode
 	}
 	return RestoreMode_RESTORE_MODE_SKIP
+}
+
+func (x *RestoreModuleBackupRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
 }
 
 type RestoreModuleBackupResponse struct {
@@ -875,6 +899,7 @@ func (x *DeleteBackupResponse) GetSuccess() bool {
 type DownloadBackupRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // required if backup is encrypted
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -912,6 +937,13 @@ func (*DownloadBackupRequest) Descriptor() ([]byte, []int) {
 func (x *DownloadBackupRequest) GetId() string {
 	if x != nil {
 		return x.Id
+	}
+	return ""
+}
+
+func (x *DownloadBackupRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
 	}
 	return ""
 }
@@ -975,6 +1007,7 @@ type CreateFullBackupRequest struct {
 	TenantId       *uint32                `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
 	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	IncludeSecrets bool                   `protobuf:"varint,4,opt,name=include_secrets,json=includeSecrets,proto3" json:"include_secrets,omitempty"` // include Vault passwords in export
+	Password       string                 `protobuf:"bytes,5,opt,name=password,proto3" json:"password,omitempty"`                                    // if set, backup is AES-256-GCM encrypted
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1037,6 +1070,13 @@ func (x *CreateFullBackupRequest) GetIncludeSecrets() bool {
 	return false
 }
 
+func (x *CreateFullBackupRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
 type FullBackupInfo struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1049,6 +1089,7 @@ type FullBackupInfo struct {
 	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	CreatedBy      string                 `protobuf:"bytes,9,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
 	Errors         []string               `protobuf:"bytes,10,rep,name=errors,proto3" json:"errors,omitempty"`
+	Encrypted      bool                   `protobuf:"varint,11,opt,name=encrypted,proto3" json:"encrypted,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1153,6 +1194,13 @@ func (x *FullBackupInfo) GetErrors() []string {
 	return nil
 }
 
+func (x *FullBackupInfo) GetEncrypted() bool {
+	if x != nil {
+		return x.Encrypted
+	}
+	return false
+}
+
 type CreateFullBackupResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Backup        *FullBackupInfo        `protobuf:"bytes,1,opt,name=backup,proto3" json:"backup,omitempty"`
@@ -1203,6 +1251,7 @@ type RestoreFullBackupRequest struct {
 	BackupId      string                 `protobuf:"bytes,1,opt,name=backup_id,json=backupId,proto3" json:"backup_id,omitempty"`
 	Targets       []*ModuleTarget        `protobuf:"bytes,2,rep,name=targets,proto3" json:"targets,omitempty"` // portal sends endpoints for each module
 	Mode          RestoreMode            `protobuf:"varint,3,opt,name=mode,proto3,enum=backup.service.v1.RestoreMode" json:"mode,omitempty"`
+	Password      string                 `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"` // required if backup is encrypted
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1256,6 +1305,13 @@ func (x *RestoreFullBackupRequest) GetMode() RestoreMode {
 		return x.Mode
 	}
 	return RestoreMode_RESTORE_MODE_SKIP
+}
+
+func (x *RestoreFullBackupRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
 }
 
 type RestoreFullBackupResponse struct {
@@ -1684,14 +1740,15 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"+backup/service/v1/backup_orchestrator.proto\x12\x11backup.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"P\n" +
 	"\fModuleTarget\x12\x1b\n" +
 	"\tmodule_id\x18\x01 \x01(\tR\bmoduleId\x12#\n" +
-	"\rgrpc_endpoint\x18\x02 \x01(\tR\fgrpcEndpoint\"\xcf\x01\n" +
+	"\rgrpc_endpoint\x18\x02 \x01(\tR\fgrpcEndpoint\"\xeb\x01\n" +
 	"\x19CreateModuleBackupRequest\x127\n" +
 	"\x06target\x18\x01 \x01(\v2\x1f.backup.service.v1.ModuleTargetR\x06target\x12 \n" +
 	"\ttenant_id\x18\x02 \x01(\rH\x00R\btenantId\x88\x01\x01\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12'\n" +
-	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecretsB\f\n" +
+	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecrets\x12\x1a\n" +
+	"\bpassword\x18\x05 \x01(\tR\bpasswordB\f\n" +
 	"\n" +
-	"_tenant_id\"\xf7\x03\n" +
+	"_tenant_id\"\x95\x04\n" +
 	"\n" +
 	"BackupInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
@@ -1710,16 +1767,18 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"created_by\x18\n" +
 	" \x01(\tR\tcreatedBy\x12\x18\n" +
 	"\aversion\x18\v \x01(\tR\aversion\x12\x1a\n" +
-	"\bwarnings\x18\f \x03(\tR\bwarnings\x1a?\n" +
+	"\bwarnings\x18\f \x03(\tR\bwarnings\x12\x1c\n" +
+	"\tencrypted\x18\r \x01(\bR\tencrypted\x1a?\n" +
 	"\x11EntityCountsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"S\n" +
 	"\x1aCreateModuleBackupResponse\x125\n" +
-	"\x06backup\x18\x01 \x01(\v2\x1d.backup.service.v1.BackupInfoR\x06backup\"\xa6\x01\n" +
+	"\x06backup\x18\x01 \x01(\v2\x1d.backup.service.v1.BackupInfoR\x06backup\"\xc2\x01\n" +
 	"\x1aRestoreModuleBackupRequest\x12\x1b\n" +
 	"\tbackup_id\x18\x01 \x01(\tR\bbackupId\x127\n" +
 	"\x06target\x18\x02 \x01(\v2\x1f.backup.service.v1.ModuleTargetR\x06target\x122\n" +
-	"\x04mode\x18\x03 \x01(\x0e2\x1e.backup.service.v1.RestoreModeR\x04mode\"\x94\x01\n" +
+	"\x04mode\x18\x03 \x01(\x0e2\x1e.backup.service.v1.RestoreModeR\x04mode\x12\x1a\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\"\x94\x01\n" +
 	"\x1bRestoreModuleBackupResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12?\n" +
 	"\aresults\x18\x02 \x03(\v2%.backup.service.v1.EntityImportResultR\aresults\x12\x1a\n" +
@@ -1749,19 +1808,21 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\x13DeleteBackupRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"0\n" +
 	"\x14DeleteBackupResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\"'\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"C\n" +
 	"\x15DownloadBackupRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"H\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"H\n" +
 	"\x16DownloadBackupResponse\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data\x12\x1a\n" +
-	"\bfilename\x18\x02 \x01(\tR\bfilename\"\xcf\x01\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\"\xeb\x01\n" +
 	"\x17CreateFullBackupRequest\x129\n" +
 	"\atargets\x18\x01 \x03(\v2\x1f.backup.service.v1.ModuleTargetR\atargets\x12 \n" +
 	"\ttenant_id\x18\x02 \x01(\rH\x00R\btenantId\x88\x01\x01\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12'\n" +
-	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecretsB\f\n" +
+	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecrets\x12\x1a\n" +
+	"\bpassword\x18\x05 \x01(\tR\bpasswordB\f\n" +
 	"\n" +
-	"_tenant_id\"\xfa\x02\n" +
+	"_tenant_id\"\x98\x03\n" +
 	"\x0eFullBackupInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1b\n" +
@@ -1776,13 +1837,15 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\n" +
 	"created_by\x18\t \x01(\tR\tcreatedBy\x12\x16\n" +
 	"\x06errors\x18\n" +
-	" \x03(\tR\x06errors\"U\n" +
+	" \x03(\tR\x06errors\x12\x1c\n" +
+	"\tencrypted\x18\v \x01(\bR\tencrypted\"U\n" +
 	"\x18CreateFullBackupResponse\x129\n" +
-	"\x06backup\x18\x01 \x01(\v2!.backup.service.v1.FullBackupInfoR\x06backup\"\xa6\x01\n" +
+	"\x06backup\x18\x01 \x01(\v2!.backup.service.v1.FullBackupInfoR\x06backup\"\xc2\x01\n" +
 	"\x18RestoreFullBackupRequest\x12\x1b\n" +
 	"\tbackup_id\x18\x01 \x01(\tR\bbackupId\x129\n" +
 	"\atargets\x18\x02 \x03(\v2\x1f.backup.service.v1.ModuleTargetR\atargets\x122\n" +
-	"\x04mode\x18\x03 \x01(\x0e2\x1e.backup.service.v1.RestoreModeR\x04mode\"\x84\x01\n" +
+	"\x04mode\x18\x03 \x01(\x0e2\x1e.backup.service.v1.RestoreModeR\x04mode\x12\x1a\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\"\x84\x01\n" +
 	"\x19RestoreFullBackupResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12M\n" +
 	"\x0emodule_results\x18\x02 \x03(\v2&.backup.service.v1.ModuleRestoreResultR\rmoduleResults\"\xbf\x01\n" +
@@ -1811,14 +1874,14 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess*@\n" +
 	"\vRestoreMode\x12\x15\n" +
 	"\x11RESTORE_MODE_SKIP\x10\x00\x12\x1a\n" +
-	"\x16RESTORE_MODE_OVERWRITE\x10\x012\x80\f\n" +
+	"\x16RESTORE_MODE_OVERWRITE\x10\x012\x83\f\n" +
 	"\x19BackupOrchestratorService\x12\x91\x01\n" +
 	"\x12CreateModuleBackup\x12,.backup.service.v1.CreateModuleBackupRequest\x1a-.backup.service.v1.CreateModuleBackupResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/v1/backups/modules\x12\xa0\x01\n" +
 	"\x13RestoreModuleBackup\x12-.backup.service.v1.RestoreModuleBackupRequest\x1a..backup.service.v1.RestoreModuleBackupResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/backups/{backup_id}/restore\x12q\n" +
 	"\vListBackups\x12%.backup.service.v1.ListBackupsRequest\x1a&.backup.service.v1.ListBackupsResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/v1/backups\x12p\n" +
 	"\tGetBackup\x12#.backup.service.v1.GetBackupRequest\x1a$.backup.service.v1.GetBackupResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/backups/{id}\x12y\n" +
-	"\fDeleteBackup\x12&.backup.service.v1.DeleteBackupRequest\x1a'.backup.service.v1.DeleteBackupResponse\"\x18\x82\xd3\xe4\x93\x02\x12*\x10/v1/backups/{id}\x12\x88\x01\n" +
-	"\x0eDownloadBackup\x12(.backup.service.v1.DownloadBackupRequest\x1a).backup.service.v1.DownloadBackupResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/backups/{id}/download\x12\x88\x01\n" +
+	"\fDeleteBackup\x12&.backup.service.v1.DeleteBackupRequest\x1a'.backup.service.v1.DeleteBackupResponse\"\x18\x82\xd3\xe4\x93\x02\x12*\x10/v1/backups/{id}\x12\x8b\x01\n" +
+	"\x0eDownloadBackup\x12(.backup.service.v1.DownloadBackupRequest\x1a).backup.service.v1.DownloadBackupResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/v1/backups/{id}/download\x12\x88\x01\n" +
 	"\x10CreateFullBackup\x12*.backup.service.v1.CreateFullBackupRequest\x1a+.backup.service.v1.CreateFullBackupResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/backups/full\x12\x9f\x01\n" +
 	"\x11RestoreFullBackup\x12+.backup.service.v1.RestoreFullBackupRequest\x1a,.backup.service.v1.RestoreFullBackupResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/backups/full/{backup_id}/restore\x12\x82\x01\n" +
 	"\x0fListFullBackups\x12).backup.service.v1.ListFullBackupsRequest\x1a*.backup.service.v1.ListFullBackupsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/backups/full\x12\x81\x01\n" +

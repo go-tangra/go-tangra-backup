@@ -81,7 +81,7 @@ func (s *OrchestratorService) CreateModuleBackup(ctx context.Context, req *backu
 		Version:      result.Version,
 	}
 
-	if err := s.storage.SaveModuleBackup(info, result.Data); err != nil {
+	if err := s.storage.SaveModuleBackup(info, result.Data, req.Password); err != nil {
 		return nil, fmt.Errorf("save backup: %w", err)
 	}
 
@@ -96,7 +96,7 @@ func (s *OrchestratorService) RestoreModuleBackup(ctx context.Context, req *back
 
 	s.log.Infof("Restoring backup %s to module %s at %s", req.BackupId, req.Target.ModuleId, req.Target.GrpcEndpoint)
 
-	data, err := s.storage.LoadModuleBackupData(req.BackupId)
+	data, err := s.storage.LoadModuleBackupData(req.BackupId, req.Password)
 	if err != nil {
 		return nil, fmt.Errorf("load backup data: %w", err)
 	}
@@ -172,7 +172,11 @@ func (s *OrchestratorService) DownloadBackup(ctx context.Context, req *backupV1.
 		return nil, fmt.Errorf("get backup metadata: %w", err)
 	}
 
-	data, err := s.storage.LoadModuleBackupData(req.Id)
+	if info.Encrypted && req.Password == "" {
+		return nil, fmt.Errorf("backup is encrypted: password required")
+	}
+
+	data, err := s.storage.LoadModuleBackupData(req.Id, req.Password)
 	if err != nil {
 		return nil, fmt.Errorf("load backup data: %w", err)
 	}
@@ -267,7 +271,7 @@ func (s *OrchestratorService) CreateFullBackup(ctx context.Context, req *backupV
 		Errors:         errors,
 	}
 
-	if err := s.storage.SaveFullBackup(info, moduleData); err != nil {
+	if err := s.storage.SaveFullBackup(info, moduleData, req.Password); err != nil {
 		return nil, fmt.Errorf("save full backup: %w", err)
 	}
 
@@ -312,7 +316,7 @@ func (s *OrchestratorService) RestoreFullBackup(ctx context.Context, req *backup
 			continue
 		}
 
-		data, err := s.storage.LoadFullBackupModuleData(req.BackupId, mb.ModuleId)
+		data, err := s.storage.LoadFullBackupModuleData(req.BackupId, mb.ModuleId, req.Password)
 		if err != nil {
 			moduleResults = append(moduleResults, &backupV1.ModuleRestoreResult{
 				ModuleId: mb.ModuleId,

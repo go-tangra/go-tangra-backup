@@ -55,13 +55,33 @@ func (s *BackupStorage) moduleDir(backupID string) string {
 }
 
 // SaveModuleBackup persists backup metadata and gzipped data to disk.
-func (s *BackupStorage) SaveModuleBackup(info *backupV1.BackupInfo, data []byte) error {
+// If password is non-empty, the gzipped data is encrypted with AES-256-GCM.
+func (s *BackupStorage) SaveModuleBackup(info *backupV1.BackupInfo, data []byte, password string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	dir := s.moduleDir(info.Id)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("create backup dir: %w", err)
+	}
+
+	// Compress data
+	compressed, err := gzipCompress(data)
+	if err != nil {
+		return fmt.Errorf("compress data: %w", err)
+	}
+
+	// Optionally encrypt
+	filename := "data.json.gz"
+	payload := compressed
+	if password != "" {
+		encrypted, err := encryptData(compressed, password)
+		if err != nil {
+			return fmt.Errorf("encrypt data: %w", err)
+		}
+		payload = encrypted
+		filename = "data.json.gz.enc"
+		info.Encrypted = true
 	}
 
 	// Write metadata (use protojson for correct timestamp/zero-value handling)
@@ -74,25 +94,43 @@ func (s *BackupStorage) SaveModuleBackup(info *backupV1.BackupInfo, data []byte)
 		return fmt.Errorf("write metadata: %w", err)
 	}
 
-	// Write gzipped data
-	compressed, err := gzipCompress(data)
-	if err != nil {
-		return fmt.Errorf("compress data: %w", err)
-	}
-	if err := os.WriteFile(filepath.Join(dir, "data.json.gz"), compressed, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, filename), payload, 0o644); err != nil {
 		return fmt.Errorf("write data: %w", err)
 	}
 
-	s.log.Infof("Saved module backup %s (%d bytes compressed)", info.Id, len(compressed))
+	s.log.Infof("Saved module backup %s (%d bytes, encrypted=%v)", info.Id, len(payload), info.Encrypted)
 	return nil
 }
 
-// LoadModuleBackupData reads and decompresses the backup payload.
-func (s *BackupStorage) LoadModuleBackupData(backupID string) ([]byte, error) {
+// LoadModuleBackupData reads, optionally decrypts, and decompresses the backup payload.
+func (s *BackupStorage) LoadModuleBackupData(backupID string, password string) ([]byte, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	compressed, err := os.ReadFile(filepath.Join(s.moduleDir(backupID), "data.json.gz"))
+	dir := s.moduleDir(backupID)
+
+	// Check for encrypted file first
+	encPath := filepath.Join(dir, "data.json.gz.enc")
+	plainPath := filepath.Join(dir, "data.json.gz")
+
+	if _, err := os.Stat(encPath); err == nil {
+		// Encrypted backup
+		if password == "" {
+			return nil, fmt.Errorf("backup is encrypted: password required")
+		}
+		encrypted, err := os.ReadFile(encPath)
+		if err != nil {
+			return nil, fmt.Errorf("read encrypted backup data: %w", err)
+		}
+		compressed, err := DecryptData(encrypted, password)
+		if err != nil {
+			return nil, fmt.Errorf("decrypt backup data: %w", err)
+		}
+		return gzipDecompress(compressed)
+	}
+
+	// Unencrypted backup
+	compressed, err := os.ReadFile(plainPath)
 	if err != nil {
 		return nil, fmt.Errorf("read backup data: %w", err)
 	}
@@ -183,13 +221,41 @@ func (s *BackupStorage) fullDir(backupID string) string {
 }
 
 // SaveFullBackup persists a full platform backup manifest and per-module data.
-func (s *BackupStorage) SaveFullBackup(info *backupV1.FullBackupInfo, moduleData map[string][]byte) error {
+// If password is non-empty, each module's gzipped data is encrypted with AES-256-GCM.
+func (s *BackupStorage) SaveFullBackup(info *backupV1.FullBackupInfo, moduleData map[string][]byte, password string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	dir := s.fullDir(info.Id)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("create full backup dir: %w", err)
+	}
+
+	if password != "" {
+		info.Encrypted = true
+	}
+
+	// Write per-module data
+	for moduleID, data := range moduleData {
+		compressed, err := gzipCompress(data)
+		if err != nil {
+			return fmt.Errorf("compress %s data: %w", moduleID, err)
+		}
+
+		filename := fmt.Sprintf("%s.json.gz", moduleID)
+		payload := compressed
+		if password != "" {
+			encrypted, err := encryptData(compressed, password)
+			if err != nil {
+				return fmt.Errorf("encrypt %s data: %w", moduleID, err)
+			}
+			payload = encrypted
+			filename = fmt.Sprintf("%s.json.gz.enc", moduleID)
+		}
+
+		if err := os.WriteFile(filepath.Join(dir, filename), payload, 0o644); err != nil {
+			return fmt.Errorf("write %s data: %w", moduleID, err)
+		}
 	}
 
 	// Write manifest (use protojson for correct timestamp/zero-value handling)
@@ -202,29 +268,38 @@ func (s *BackupStorage) SaveFullBackup(info *backupV1.FullBackupInfo, moduleData
 		return fmt.Errorf("write manifest: %w", err)
 	}
 
-	// Write per-module data
-	for moduleID, data := range moduleData {
-		compressed, err := gzipCompress(data)
-		if err != nil {
-			return fmt.Errorf("compress %s data: %w", moduleID, err)
-		}
-		filename := fmt.Sprintf("%s.json.gz", moduleID)
-		if err := os.WriteFile(filepath.Join(dir, filename), compressed, 0o644); err != nil {
-			return fmt.Errorf("write %s data: %w", moduleID, err)
-		}
-	}
-
-	s.log.Infof("Saved full backup %s with %d modules", info.Id, len(moduleData))
+	s.log.Infof("Saved full backup %s with %d modules (encrypted=%v)", info.Id, len(moduleData), info.Encrypted)
 	return nil
 }
 
-// LoadFullBackupModuleData reads and decompresses a single module's data from a full backup.
-func (s *BackupStorage) LoadFullBackupModuleData(backupID, moduleID string) ([]byte, error) {
+// LoadFullBackupModuleData reads, optionally decrypts, and decompresses a single module's data from a full backup.
+func (s *BackupStorage) LoadFullBackupModuleData(backupID, moduleID string, password string) ([]byte, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	filename := filepath.Join(s.fullDir(backupID), fmt.Sprintf("%s.json.gz", moduleID))
-	compressed, err := os.ReadFile(filename)
+	dir := s.fullDir(backupID)
+
+	// Check for encrypted file first
+	encPath := filepath.Join(dir, fmt.Sprintf("%s.json.gz.enc", moduleID))
+	plainPath := filepath.Join(dir, fmt.Sprintf("%s.json.gz", moduleID))
+
+	if _, err := os.Stat(encPath); err == nil {
+		if password == "" {
+			return nil, fmt.Errorf("backup is encrypted: password required")
+		}
+		encrypted, err := os.ReadFile(encPath)
+		if err != nil {
+			return nil, fmt.Errorf("read encrypted module data %s: %w", moduleID, err)
+		}
+		compressed, err := DecryptData(encrypted, password)
+		if err != nil {
+			return nil, fmt.Errorf("decrypt module data %s: %w", moduleID, err)
+		}
+		return gzipDecompress(compressed)
+	}
+
+	// Unencrypted backup
+	compressed, err := os.ReadFile(plainPath)
 	if err != nil {
 		return nil, fmt.Errorf("read module data %s: %w", moduleID, err)
 	}

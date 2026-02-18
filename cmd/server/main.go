@@ -1,7 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
+	"flag"
+	"fmt"
+	"io"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-kratos/kratos/v2"
@@ -13,6 +20,7 @@ import (
 	"github.com/go-tangra/go-tangra-common/registration"
 	"github.com/go-tangra/go-tangra-common/service"
 	"github.com/go-tangra/go-tangra-backup/cmd/server/assets"
+	backupService "github.com/go-tangra/go-tangra-backup/internal/service"
 )
 
 var (
@@ -63,7 +71,73 @@ func runApp() error {
 	return bootstrap.RunApp(ctx, initApp)
 }
 
+func runDecrypt() error {
+	fs := flag.NewFlagSet("decrypt", flag.ExitOnError)
+	fileName := fs.String("file", "", "path to encrypted backup file (.enc)")
+	password := fs.String("password", "", "decryption password")
+	output := fs.String("output", "", "output file path (default: input without .enc suffix)")
+	fs.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s decrypt --file <path> --password <password> [--output <path>]\n\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Decrypt an AES-256-GCM encrypted backup file.\n\n")
+		fs.PrintDefaults()
+	}
+
+	if err := fs.Parse(os.Args[2:]); err != nil {
+		return err
+	}
+
+	if *fileName == "" || *password == "" {
+		fs.Usage()
+		return fmt.Errorf("both --file and --password are required")
+	}
+
+	encrypted, err := os.ReadFile(*fileName)
+	if err != nil {
+		return fmt.Errorf("read file: %w", err)
+	}
+
+	compressed, err := backupService.DecryptData(encrypted, *password)
+	if err != nil {
+		return fmt.Errorf("decrypt: %w", err)
+	}
+
+	// Decompress gzip
+	gr, err := gzip.NewReader(bytes.NewReader(compressed))
+	if err != nil {
+		return fmt.Errorf("gzip reader: %w", err)
+	}
+	defer gr.Close()
+
+	plaintext, err := io.ReadAll(gr)
+	if err != nil {
+		return fmt.Errorf("decompress: %w", err)
+	}
+
+	// Determine output path
+	outPath := *output
+	if outPath == "" {
+		outPath = strings.TrimSuffix(*fileName, ".enc")
+		// If the file was .json.gz.enc, strip to .json
+		outPath = strings.TrimSuffix(outPath, ".gz")
+	}
+
+	if err := os.WriteFile(outPath, plaintext, 0o644); err != nil {
+		return fmt.Errorf("write output: %w", err)
+	}
+
+	fmt.Printf("Decrypted %s -> %s (%d bytes)\n", *fileName, outPath, len(plaintext))
+	return nil
+}
+
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "decrypt" {
+		if err := runDecrypt(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if err := runApp(); err != nil {
 		panic(err)
 	}

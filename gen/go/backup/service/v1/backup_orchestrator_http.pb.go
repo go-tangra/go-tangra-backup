@@ -54,7 +54,7 @@ func RegisterBackupOrchestratorServiceHTTPServer(s *http.Server, srv BackupOrche
 	r.GET("/v1/backups", _BackupOrchestratorService_ListBackups0_HTTP_Handler(srv))
 	r.GET("/v1/backups/{id}", _BackupOrchestratorService_GetBackup0_HTTP_Handler(srv))
 	r.DELETE("/v1/backups/{id}", _BackupOrchestratorService_DeleteBackup0_HTTP_Handler(srv))
-	r.GET("/v1/backups/{id}/download", _BackupOrchestratorService_DownloadBackup0_HTTP_Handler(srv))
+	r.POST("/v1/backups/{id}/download", _BackupOrchestratorService_DownloadBackup0_HTTP_Handler(srv))
 	r.POST("/v1/backups/full", _BackupOrchestratorService_CreateFullBackup0_HTTP_Handler(srv))
 	r.POST("/v1/backups/full/{backup_id}/restore", _BackupOrchestratorService_RestoreFullBackup0_HTTP_Handler(srv))
 	r.GET("/v1/backups/full", _BackupOrchestratorService_ListFullBackups0_HTTP_Handler(srv))
@@ -175,6 +175,9 @@ func _BackupOrchestratorService_DeleteBackup0_HTTP_Handler(srv BackupOrchestrato
 func _BackupOrchestratorService_DownloadBackup0_HTTP_Handler(srv BackupOrchestratorServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in DownloadBackupRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -385,10 +388,10 @@ func (c *BackupOrchestratorServiceHTTPClientImpl) DeleteFullBackup(ctx context.C
 func (c *BackupOrchestratorServiceHTTPClientImpl) DownloadBackup(ctx context.Context, in *DownloadBackupRequest, opts ...http.CallOption) (*DownloadBackupResponse, error) {
 	var out DownloadBackupResponse
 	pattern := "/v1/backups/{id}/download"
-	path := binding.EncodeURL(pattern, in, true)
+	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBackupOrchestratorServiceDownloadBackup))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

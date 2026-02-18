@@ -23,6 +23,7 @@ message CreateModuleBackupRequest {
   optional uint32 tenant_id = 2;  // 0 = full cross-tenant (platform admin only)
   string description = 3;
   bool include_secrets = 4;       // include Vault passwords in export
+  string password = 5;            // if set, backup is AES-256-GCM encrypted
 }
 
 message BackupInfo {
@@ -38,6 +39,7 @@ message BackupInfo {
   string created_by = 10;
   string version = 11;
   repeated string warnings = 12;
+  bool encrypted = 13;
 }
 
 message CreateModuleBackupResponse {
@@ -49,6 +51,7 @@ message RestoreModuleBackupRequest {
   string backup_id = 1;
   ModuleTarget target = 2;
   RestoreMode mode = 3;
+  string password = 4;            // required if backup is encrypted
 }
 
 message RestoreModuleBackupResponse {
@@ -100,6 +103,7 @@ message DeleteBackupResponse {
 // Download raw backup data
 message DownloadBackupRequest {
   string id = 1;
+  string password = 2;            // required if backup is encrypted
 }
 
 message DownloadBackupResponse {
@@ -113,6 +117,7 @@ message CreateFullBackupRequest {
   optional uint32 tenant_id = 2;
   string description = 3;
   bool include_secrets = 4;           // include Vault passwords in export
+  string password = 5;                // if set, backup is AES-256-GCM encrypted
 }
 
 message FullBackupInfo {
@@ -126,6 +131,7 @@ message FullBackupInfo {
   google.protobuf.Timestamp created_at = 8;
   string created_by = 9;
   repeated string errors = 10;
+  bool encrypted = 11;
 }
 
 message CreateFullBackupResponse {
@@ -137,6 +143,7 @@ message RestoreFullBackupRequest {
   string backup_id = 1;
   repeated ModuleTarget targets = 2;  // portal sends endpoints for each module
   RestoreMode mode = 3;
+  string password = 4;                // required if backup is encrypted
 }
 
 message RestoreFullBackupResponse {
@@ -200,7 +207,7 @@ service BackupOrchestratorService {
     option (google.api.http) = { delete: "/v1/backups/{id}" };
   }
   rpc DownloadBackup(DownloadBackupRequest) returns (DownloadBackupResponse) {
-    option (google.api.http) = { get: "/v1/backups/{id}/download" };
+    option (google.api.http) = { post: "/v1/backups/{id}/download" body: "*" };
   }
 
   // Full platform operations
