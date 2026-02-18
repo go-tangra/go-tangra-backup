@@ -107,17 +107,21 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 
 // dialModule establishes a gRPC connection to a module endpoint.
 func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), error) {
+	c.log.Infof("dialModule: raw endpoint=%q", endpoint)
+
 	// grpc.NewClient requires a URI scheme; passthrough lets the OS handle DNS
 	if !strings.Contains(endpoint, "://") {
 		endpoint = "passthrough:///" + endpoint
 	}
+	c.log.Infof("dialModule: resolved target=%q", endpoint)
 
 	var dialOpt grpc.DialOption
 	creds, err := loadClientTLSCredentials(c.log)
 	if err != nil {
-		c.log.Warnf("Failed to load TLS credentials, using insecure: %v", err)
+		c.log.Warnf("dialModule: TLS credentials failed, using insecure: %v", err)
 		dialOpt = grpc.WithTransportCredentials(insecure.NewCredentials())
 	} else {
+		c.log.Infof("dialModule: using mTLS client credentials")
 		dialOpt = grpc.WithTransportCredentials(creds)
 	}
 
