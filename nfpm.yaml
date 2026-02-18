@@ -1,0 +1,57 @@
+name: tangra-backup
+arch: ${ARCH}
+version: ${VERSION}
+maintainer: Go Tangra <support@go-tangra.dev>
+description: Tangra Backup Server - Centralized backup and restore orchestration for all platform modules
+homepage: https://github.com/go-tangra/go-tangra-backup
+license: MIT
+vendor: Go Tangra
+
+contents:
+  # Binary
+  - src: dist/tangra-backup
+    dst: /usr/local/bin/tangra-backup
+    file_info:
+      mode: 0755
+
+  # Systemd service
+  - src: deploy/tangra-backup.service
+    dst: /etc/systemd/system/tangra-backup.service
+    file_info:
+      mode: 0644
+
+  # Config files (only if not already present)
+  - src: deploy/config.yaml
+    dst: /etc/tangra-backup/server.yaml
+    type: config|noreplace
+    file_info:
+      mode: 0600
+
+  - src: deploy/logger.yaml
+    dst: /etc/tangra-backup/logger.yaml
+    type: config|noreplace
+    file_info:
+      mode: 0600
+
+  # Create directories
+  - dst: /etc/tangra-backup/certs
+    type: dir
+    file_info:
+      mode: 0700
+
+  - dst: /var/lib/tangra-backup
+    type: dir
+    file_info:
+      mode: 0700
+
+scripts:
+  postinstall: deploy/scripts/postinstall.sh
+  preremove: deploy/scripts/preremove.sh
+
+overrides:
+  deb:
+    depends:
+      - systemd
+  rpm:
+    depends:
+      - systemd

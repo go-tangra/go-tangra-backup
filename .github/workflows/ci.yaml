@@ -17,6 +17,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  GO_VERSION: '1.25'
 
 permissions:
   contents: write
@@ -33,7 +34,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: ${{ env.GO_VERSION }}
           cache: true
 
       - name: Download dependencies
@@ -41,44 +42,6 @@ jobs:
 
       - name: Build
         run: go build ./...
-
-  package:
-    name: Package Linux x64
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-          cache: true
-
-      - name: Setup Buf
-        uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ github.token }}
-
-      - name: Build proto descriptor
-        run: buf build -o cmd/server/assets/descriptor.bin --exclude-source-info
-
-      - name: Build linux/amd64 binary
-        env:
-          CGO_ENABLED: 0
-          GOOS: linux
-          GOARCH: amd64
-        run: |
-          go build -ldflags "-X main.version=${{ github.ref_name }} -s -w" \
-            -o dist/backup-server-linux-amd64 \
-            ./cmd/server
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: backup-server-linux-amd64
-          path: dist/backup-server-linux-amd64
 
   buf-lint:
     name: Buf Lint
@@ -189,6 +152,80 @@ jobs:
           build-args: |
             APP_VERSION=${{ github.ref_name }}
 
+  package:
+    name: Package ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - build
+      - buf-lint
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            goarch: amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+
+      - name: Build proto descriptor
+        run: buf build -o cmd/server/assets/descriptor.bin --exclude-source-info
+
+      - name: Build static binary
+        env:
+          CGO_ENABLED: '0'
+          GOOS: linux
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          COMMIT=$(git rev-parse --short HEAD)
+          DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          go build -trimpath \
+            -ldflags "-s -w -extldflags '-static' \
+              -X main.version=${VERSION} \
+              -X main.commitHash=${COMMIT} \
+              -X main.buildDate=${DATE}" \
+            -o dist/tangra-backup-linux-${{ matrix.goarch }} \
+            ./cmd/server
+
+      - name: Install nfpm
+        run: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+
+      - name: Build packages
+        env:
+          ARCH: ${{ matrix.arch }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          export VERSION ARCH
+
+          # nfpm expects dist/tangra-backup
+          ln -sf tangra-backup-linux-${{ matrix.goarch }} dist/tangra-backup
+
+          # Build .deb
+          envsubst < nfpm.yaml | nfpm package -f /dev/stdin -p deb -t dist/
+          # Build .rpm
+          envsubst < nfpm.yaml | nfpm package -f /dev/stdin -p rpm -t dist/
+
+          # Remove symlink so it doesn't end up in artifacts
+          rm -f dist/tangra-backup
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.arch }}
+          path: dist/*
+
   release:
     name: Create Release
     runs-on: ubuntu-latest
@@ -196,45 +233,23 @@ jobs:
     needs:
       - package
       - docker-build
-    permissions:
-      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download artifact
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: backup-server-linux-amd64
-          path: dist/
+          path: dist
+          merge-multiple: true
 
-      - name: Generate changelog
-        id: changelog
+      - name: Generate checksums
         run: |
-          PREV_TAG=$(git tag --sort=-v:refname | head -2 | tail -1)
-          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" = "${{ github.ref_name }}" ]; then
-            echo "body=Initial release" >> "$GITHUB_OUTPUT"
-          else
-            LOG=$(git log --pretty=format:"- %s (%h)" "$PREV_TAG".."${{ github.ref_name }}" -- | head -50)
-            {
-              echo "body<<EOF"
-              echo "$LOG"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          fi
+          cd dist
+          sha256sum tangra-backup-linux-* *.deb *.rpm > tangra-backup-checksums.sha256
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.body }}
-          draft: false
-          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
-          files: |
-            dist/backup-server-linux-amd64
+          generate_release_notes: true
+          files: dist/*
 
   cleanup-ghcr:
     name: Cleanup Old GHCR Images

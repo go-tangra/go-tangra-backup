@@ -1,0 +1,13 @@
+# Tangra Backup Server Configuration
+# Place this file at /etc/tangra-backup/server.yaml
+
+server:
+  grpc:
+    addr: 0.0.0.0:10100
+    timeout: 300s
+    middleware:
+      enable_logging: true
+      enable_recovery: true
+      enable_tracing: false
+      enable_validate: true
+      enable_metadata: true

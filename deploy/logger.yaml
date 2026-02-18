@@ -1,0 +1,7 @@
+# Tangra Backup Logger Configuration
+# Place this file at /etc/tangra-backup/logger.yaml
+
+logger:
+  level: info
+  output: stdout
+  format: json

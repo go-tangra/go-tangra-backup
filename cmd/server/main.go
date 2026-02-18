@@ -19,6 +19,8 @@ var (
 	moduleID    = "backup"
 	moduleName  = "Backup"
 	version     = "1.0.0"
+	commitHash  = "unknown"
+	buildDate   = "unknown"
 	description = "Centralized backup and restore orchestration for all platform modules"
 )
 
