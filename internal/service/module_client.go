@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -106,6 +107,11 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 
 // dialModule establishes a gRPC connection to a module endpoint.
 func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), error) {
+	// grpc.NewClient requires a scheme; add dns:/// if none present
+	if !strings.Contains(endpoint, "://") {
+		endpoint = "dns:///" + endpoint
+	}
+
 	var dialOpt grpc.DialOption
 	creds, err := loadClientTLSCredentials(c.log)
 	if err != nil {
