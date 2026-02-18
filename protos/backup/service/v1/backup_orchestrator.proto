@@ -22,6 +22,7 @@ message CreateModuleBackupRequest {
   ModuleTarget target = 1;
   optional uint32 tenant_id = 2;  // 0 = full cross-tenant (platform admin only)
   string description = 3;
+  bool include_secrets = 4;       // include Vault passwords in export
 }
 
 message BackupInfo {
@@ -111,6 +112,7 @@ message CreateFullBackupRequest {
   repeated ModuleTarget targets = 1;  // portal sends all registered modules
   optional uint32 tenant_id = 2;
   string description = 3;
+  bool include_secrets = 4;           // include Vault passwords in export
 }
 
 message FullBackupInfo {

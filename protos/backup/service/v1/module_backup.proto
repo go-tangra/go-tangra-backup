@@ -12,6 +12,7 @@ import "backup/service/v1/backup_orchestrator.proto";
 
 message ModuleExportRequest {
   optional uint32 tenant_id = 1;
+  bool include_secrets = 2;
 }
 
 message ModuleExportResponse {

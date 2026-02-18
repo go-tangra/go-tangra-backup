@@ -48,7 +48,7 @@ func (s *OrchestratorService) CreateModuleBackup(ctx context.Context, req *backu
 
 	s.log.Infof("Creating backup for module %s at %s", req.Target.ModuleId, req.Target.GrpcEndpoint)
 
-	result, err := s.moduleClient.ExportBackup(ctx, req.Target, req.TenantId)
+	result, err := s.moduleClient.ExportBackup(ctx, req.Target, req.TenantId, req.IncludeSecrets)
 	if err != nil {
 		// Save a failed backup record
 		backupID := uuid.New().String()
@@ -210,7 +210,7 @@ func (s *OrchestratorService) CreateFullBackup(ctx context.Context, req *backupV
 		wg.Add(1)
 		go func(idx int, t *backupV1.ModuleTarget) {
 			defer wg.Done()
-			result, err := s.moduleClient.ExportBackup(ctx, t, req.TenantId)
+			result, err := s.moduleClient.ExportBackup(ctx, t, req.TenantId, req.IncludeSecrets)
 			results[idx] = moduleResult{target: t, result: result, err: err}
 		}(i, target)
 	}

@@ -45,7 +45,7 @@ func NewModuleClient(ctx *bootstrap.Context) *ModuleClient {
 }
 
 // ExportBackup calls the target module's BackupService.ExportBackup via dynamic gRPC invocation.
-func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.ModuleTarget, tenantID *uint32) (*ExportResult, error) {
+func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.ModuleTarget, tenantID *uint32, includeSecrets bool) (*ExportResult, error) {
 	conn, cleanup, err := c.dialModule(target.GrpcEndpoint)
 	if err != nil {
 		return nil, fmt.Errorf("dial %s at %s: %w", target.ModuleId, target.GrpcEndpoint, err)
@@ -55,7 +55,7 @@ func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.Module
 	// Construct method path dynamically: /{moduleId}.service.v1.BackupService/ExportBackup
 	method := fmt.Sprintf("/%s.service.v1.BackupService/ExportBackup", target.ModuleId)
 
-	req := &backupV1.ModuleExportRequest{TenantId: tenantID}
+	req := &backupV1.ModuleExportRequest{TenantId: tenantID, IncludeSecrets: includeSecrets}
 	resp := &backupV1.ModuleExportResponse{}
 
 	// Forward auth metadata with a per-call timeout

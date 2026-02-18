@@ -124,12 +124,13 @@ func (x *ModuleTarget) GetGrpcEndpoint() string {
 
 // Single module backup
 type CreateModuleBackupRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Target        *ModuleTarget          `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
-	TenantId      *uint32                `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"` // 0 = full cross-tenant (platform admin only)
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Target         *ModuleTarget          `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
+	TenantId       *uint32                `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"` // 0 = full cross-tenant (platform admin only)
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	IncludeSecrets bool                   `protobuf:"varint,4,opt,name=include_secrets,json=includeSecrets,proto3" json:"include_secrets,omitempty"` // include Vault passwords in export
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CreateModuleBackupRequest) Reset() {
@@ -181,6 +182,13 @@ func (x *CreateModuleBackupRequest) GetDescription() string {
 		return x.Description
 	}
 	return ""
+}
+
+func (x *CreateModuleBackupRequest) GetIncludeSecrets() bool {
+	if x != nil {
+		return x.IncludeSecrets
+	}
+	return false
 }
 
 type BackupInfo struct {
@@ -962,12 +970,13 @@ func (x *DownloadBackupResponse) GetFilename() string {
 
 // Full platform backup (all modules)
 type CreateFullBackupRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Targets       []*ModuleTarget        `protobuf:"bytes,1,rep,name=targets,proto3" json:"targets,omitempty"` // portal sends all registered modules
-	TenantId      *uint32                `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Targets        []*ModuleTarget        `protobuf:"bytes,1,rep,name=targets,proto3" json:"targets,omitempty"` // portal sends all registered modules
+	TenantId       *uint32                `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	IncludeSecrets bool                   `protobuf:"varint,4,opt,name=include_secrets,json=includeSecrets,proto3" json:"include_secrets,omitempty"` // include Vault passwords in export
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CreateFullBackupRequest) Reset() {
@@ -1019,6 +1028,13 @@ func (x *CreateFullBackupRequest) GetDescription() string {
 		return x.Description
 	}
 	return ""
+}
+
+func (x *CreateFullBackupRequest) GetIncludeSecrets() bool {
+	if x != nil {
+		return x.IncludeSecrets
+	}
+	return false
 }
 
 type FullBackupInfo struct {
@@ -1668,11 +1684,12 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"+backup/service/v1/backup_orchestrator.proto\x12\x11backup.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"P\n" +
 	"\fModuleTarget\x12\x1b\n" +
 	"\tmodule_id\x18\x01 \x01(\tR\bmoduleId\x12#\n" +
-	"\rgrpc_endpoint\x18\x02 \x01(\tR\fgrpcEndpoint\"\xa6\x01\n" +
+	"\rgrpc_endpoint\x18\x02 \x01(\tR\fgrpcEndpoint\"\xcf\x01\n" +
 	"\x19CreateModuleBackupRequest\x127\n" +
 	"\x06target\x18\x01 \x01(\v2\x1f.backup.service.v1.ModuleTargetR\x06target\x12 \n" +
 	"\ttenant_id\x18\x02 \x01(\rH\x00R\btenantId\x88\x01\x01\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescriptionB\f\n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12'\n" +
+	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecretsB\f\n" +
 	"\n" +
 	"_tenant_id\"\xf7\x03\n" +
 	"\n" +
@@ -1737,11 +1754,12 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"H\n" +
 	"\x16DownloadBackupResponse\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data\x12\x1a\n" +
-	"\bfilename\x18\x02 \x01(\tR\bfilename\"\xa6\x01\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\"\xcf\x01\n" +
 	"\x17CreateFullBackupRequest\x129\n" +
 	"\atargets\x18\x01 \x03(\v2\x1f.backup.service.v1.ModuleTargetR\atargets\x12 \n" +
 	"\ttenant_id\x18\x02 \x01(\rH\x00R\btenantId\x88\x01\x01\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescriptionB\f\n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12'\n" +
+	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecretsB\f\n" +
 	"\n" +
 	"_tenant_id\"\xfa\x02\n" +
 	"\x0eFullBackupInfo\x12\x0e\n" +

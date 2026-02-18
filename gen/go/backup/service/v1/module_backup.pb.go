@@ -23,10 +23,11 @@ const (
 )
 
 type ModuleExportRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TenantId      *uint32                `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TenantId       *uint32                `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
+	IncludeSecrets bool                   `protobuf:"varint,2,opt,name=include_secrets,json=includeSecrets,proto3" json:"include_secrets,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ModuleExportRequest) Reset() {
@@ -64,6 +65,13 @@ func (x *ModuleExportRequest) GetTenantId() uint32 {
 		return *x.TenantId
 	}
 	return 0
+}
+
+func (x *ModuleExportRequest) GetIncludeSecrets() bool {
+	if x != nil {
+		return x.IncludeSecrets
+	}
+	return false
 }
 
 type ModuleExportResponse struct {
@@ -266,9 +274,10 @@ var File_backup_service_v1_module_backup_proto protoreflect.FileDescriptor
 
 const file_backup_service_v1_module_backup_proto_rawDesc = "" +
 	"\n" +
-	"%backup/service/v1/module_backup.proto\x12\x11backup.service.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a+backup/service/v1/backup_orchestrator.proto\"E\n" +
+	"%backup/service/v1/module_backup.proto\x12\x11backup.service.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a+backup/service/v1/backup_orchestrator.proto\"n\n" +
 	"\x13ModuleExportRequest\x12 \n" +
-	"\ttenant_id\x18\x01 \x01(\rH\x00R\btenantId\x88\x01\x01B\f\n" +
+	"\ttenant_id\x18\x01 \x01(\rH\x00R\btenantId\x88\x01\x01\x12'\n" +
+	"\x0finclude_secrets\x18\x02 \x01(\bR\x0eincludeSecretsB\f\n" +
 	"\n" +
 	"_tenant_id\"\xd7\x02\n" +
 	"\x14ModuleExportResponse\x12\x12\n" +
