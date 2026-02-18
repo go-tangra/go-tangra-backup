@@ -107,9 +107,9 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 
 // dialModule establishes a gRPC connection to a module endpoint.
 func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), error) {
-	// grpc.NewClient requires a scheme; add dns:/// if none present
+	// grpc.NewClient requires a URI scheme; passthrough lets the OS handle DNS
 	if !strings.Contains(endpoint, "://") {
-		endpoint = "dns:///" + endpoint
+		endpoint = "passthrough:///" + endpoint
 	}
 
 	var dialOpt grpc.DialOption
