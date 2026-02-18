@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	backupV1 "github.com/go-tangra/go-tangra-backup/gen/go/backup/service/v1"
 )
@@ -62,8 +62,9 @@ func (s *BackupStorage) SaveModuleBackup(info *backupV1.BackupInfo, data []byte)
 		return fmt.Errorf("create backup dir: %w", err)
 	}
 
-	// Write metadata
-	metaBytes, err := json.MarshalIndent(info, "", "  ")
+	// Write metadata (use protojson for correct timestamp/zero-value handling)
+	marshaler := protojson.MarshalOptions{Indent: "  ", EmitUnpopulated: true}
+	metaBytes, err := marshaler.Marshal(info)
 	if err != nil {
 		return fmt.Errorf("marshal metadata: %w", err)
 	}
@@ -112,7 +113,7 @@ func (s *BackupStorage) readModuleMetadata(backupID string) (*backupV1.BackupInf
 	}
 
 	var info backupV1.BackupInfo
-	if err := json.Unmarshal(metaBytes, &info); err != nil {
+	if err := protojson.Unmarshal(metaBytes, &info); err != nil {
 		return nil, fmt.Errorf("unmarshal metadata: %w", err)
 	}
 	return &info, nil
@@ -189,8 +190,9 @@ func (s *BackupStorage) SaveFullBackup(info *backupV1.FullBackupInfo, moduleData
 		return fmt.Errorf("create full backup dir: %w", err)
 	}
 
-	// Write manifest
-	metaBytes, err := json.MarshalIndent(info, "", "  ")
+	// Write manifest (use protojson for correct timestamp/zero-value handling)
+	marshaler := protojson.MarshalOptions{Indent: "  ", EmitUnpopulated: true}
+	metaBytes, err := marshaler.Marshal(info)
 	if err != nil {
 		return fmt.Errorf("marshal manifest: %w", err)
 	}
@@ -243,7 +245,7 @@ func (s *BackupStorage) readFullMetadata(backupID string) (*backupV1.FullBackupI
 	}
 
 	var info backupV1.FullBackupInfo
-	if err := json.Unmarshal(metaBytes, &info); err != nil {
+	if err := protojson.Unmarshal(metaBytes, &info); err != nil {
 		return nil, fmt.Errorf("unmarshal manifest: %w", err)
 	}
 	return &info, nil
