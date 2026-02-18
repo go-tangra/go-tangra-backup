@@ -12,6 +12,26 @@ RestartSec=10
 StartLimitIntervalSec=300
 StartLimitBurst=5
 
+# Environment file (create /etc/tangra-backup/env with your values)
+EnvironmentFile=-/etc/tangra-backup/env
+
+# Admin service registration
+Environment=ADMIN_GRPC_ENDPOINT=
+Environment=GRPC_ADVERTISE_ADDR=0.0.0.0:10100
+Environment=MODULE_REGISTRATION_SECRET=
+
+# Backup storage path
+Environment=BACKUP_STORAGE_PATH=/var/lib/tangra-backup
+
+# mTLS server certs (gRPC server)
+Environment=BACKUP_CA_CERT_PATH=/etc/tangra-backup/certs/ca.crt
+Environment=BACKUP_SERVER_CERT_PATH=/etc/tangra-backup/certs/server.crt
+Environment=BACKUP_SERVER_KEY_PATH=/etc/tangra-backup/certs/server.key
+
+# mTLS client certs (for calling modules)
+Environment=BACKUP_CLIENT_CERT_PATH=/etc/tangra-backup/certs/client.crt
+Environment=BACKUP_CLIENT_KEY_PATH=/etc/tangra-backup/certs/client.key
+
 # Security hardening
 NoNewPrivileges=true
 ProtectSystem=strict
