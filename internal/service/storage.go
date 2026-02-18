@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	backupV1 "github.com/go-tangra/go-tangra-backup/gen/go/backup/service/v1"
 )
@@ -113,7 +115,7 @@ func (s *BackupStorage) readModuleMetadata(backupID string) (*backupV1.BackupInf
 	}
 
 	var info backupV1.BackupInfo
-	if err := protojson.Unmarshal(metaBytes, &info); err != nil {
+	if err := unmarshalWithFallback(metaBytes, &info); err != nil {
 		return nil, fmt.Errorf("unmarshal metadata: %w", err)
 	}
 	return &info, nil
@@ -245,7 +247,7 @@ func (s *BackupStorage) readFullMetadata(backupID string) (*backupV1.FullBackupI
 	}
 
 	var info backupV1.FullBackupInfo
-	if err := protojson.Unmarshal(metaBytes, &info); err != nil {
+	if err := unmarshalWithFallback(metaBytes, &info); err != nil {
 		return nil, fmt.Errorf("unmarshal manifest: %w", err)
 	}
 	return &info, nil
@@ -301,6 +303,25 @@ func (s *BackupStorage) DeleteFullBackup(backupID string) error {
 		return fmt.Errorf("full backup not found: %s", backupID)
 	}
 	return os.RemoveAll(dir)
+}
+
+// --- Unmarshal helpers ---
+
+// unmarshalWithFallback tries protojson first, then falls back to encoding/json
+// for backward compatibility with metadata written before the protojson migration.
+// Old metadata used encoding/json which produces snake_case keys and object-style
+// timestamps ({seconds, nanos}), while protojson expects camelCase and RFC3339 strings.
+func unmarshalWithFallback(data []byte, msg proto.Message) error {
+	// Try protojson first (new format)
+	if err := protojson.Unmarshal(data, msg); err == nil {
+		return nil
+	}
+	// Fallback to encoding/json (old format with snake_case keys + object timestamps)
+	proto.Reset(msg)
+	if err := json.Unmarshal(data, msg); err != nil {
+		return fmt.Errorf("unmarshal (both protojson and json failed): %w", err)
+	}
+	return nil
 }
 
 // --- Compression helpers ---
