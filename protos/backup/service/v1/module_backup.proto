@@ -1,0 +1,35 @@
+syntax = "proto3";
+package backup.service.v1;
+
+import "google/protobuf/timestamp.proto";
+import "backup/service/v1/backup_orchestrator.proto";
+
+// Wire-compatible copies of the module backup messages (same field numbers).
+// These are used only as marshaling helpers for dynamic gRPC invocation —
+// they are NOT exposed as a gRPC service. Since all modules' backup protos
+// share identical field numbers, the protobuf wire format is compatible
+// regardless of package name.
+
+message ModuleExportRequest {
+  optional uint32 tenant_id = 1;
+}
+
+message ModuleExportResponse {
+  bytes data = 1;
+  string module = 2;
+  string version = 3;
+  google.protobuf.Timestamp exported_at = 4;
+  uint32 tenant_id = 5;
+  map<string, int64> entity_counts = 6;
+}
+
+message ModuleImportRequest {
+  bytes data = 1;
+  RestoreMode mode = 2;
+}
+
+message ModuleImportResponse {
+  bool success = 1;
+  repeated EntityImportResult results = 2;
+  repeated string warnings = 3;
+}

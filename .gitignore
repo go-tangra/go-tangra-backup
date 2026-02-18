@@ -1,0 +1,16 @@
+# Binaries
+bin/
+dist/
+*.exe
+
+# Test coverage
+coverage.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Claude Code
+CLAUDE.md

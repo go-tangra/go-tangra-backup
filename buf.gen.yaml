@@ -1,0 +1,30 @@
+version: v2
+
+clean: true
+
+managed:
+  enabled: true
+
+  disable:
+    - module: buf.build/googleapis/googleapis
+    - module: buf.build/bufbuild/protovalidate
+
+  override:
+    - file_option: go_package
+      path: backup/service/v1
+      value: github.com/go-tangra/go-tangra-backup/gen/go/backup/service/v1;backuppb
+
+plugins:
+  - local: protoc-gen-go
+    out: gen/go
+    opt: paths=source_relative
+
+  - local: protoc-gen-go-grpc
+    out: gen/go
+    opt:
+      - paths=source_relative
+
+  - local: protoc-gen-go-http
+    out: gen/go
+    opt:
+      - paths=source_relative

@@ -1,0 +1,220 @@
+syntax = "proto3";
+package backup.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// RestoreMode matches the enum in each module's backup.proto
+enum RestoreMode {
+  RESTORE_MODE_SKIP = 0;
+  RESTORE_MODE_OVERWRITE = 1;
+}
+
+// --- Orchestrator Service (portal calls this) ---
+
+message ModuleTarget {
+  string module_id = 1;        // e.g., "ipam"
+  string grpc_endpoint = 2;    // e.g., "ipam-service:9400"
+}
+
+// Single module backup
+message CreateModuleBackupRequest {
+  ModuleTarget target = 1;
+  optional uint32 tenant_id = 2;  // 0 = full cross-tenant (platform admin only)
+  string description = 3;
+}
+
+message BackupInfo {
+  string id = 1;
+  string module_id = 2;
+  string description = 3;
+  uint32 tenant_id = 4;
+  bool full_backup = 5;
+  string status = 6;           // "completed", "failed"
+  int64 size_bytes = 7;
+  map<string, int64> entity_counts = 8;
+  google.protobuf.Timestamp created_at = 9;
+  string created_by = 10;
+  string version = 11;
+  repeated string warnings = 12;
+}
+
+message CreateModuleBackupResponse {
+  BackupInfo backup = 1;
+}
+
+// Restore
+message RestoreModuleBackupRequest {
+  string backup_id = 1;
+  ModuleTarget target = 2;
+  RestoreMode mode = 3;
+}
+
+message RestoreModuleBackupResponse {
+  bool success = 1;
+  repeated EntityImportResult results = 2;
+  repeated string warnings = 3;
+}
+
+message EntityImportResult {
+  string entity_type = 1;
+  int64 total = 2;
+  int64 created = 3;
+  int64 updated = 4;
+  int64 skipped = 5;
+  int64 failed = 6;
+}
+
+// List
+message ListBackupsRequest {
+  string module_id = 1;        // filter by module (optional)
+  optional uint32 tenant_id = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message ListBackupsResponse {
+  repeated BackupInfo backups = 1;
+  int32 total = 2;
+}
+
+// Get
+message GetBackupRequest {
+  string id = 1;
+}
+
+message GetBackupResponse {
+  BackupInfo backup = 1;
+}
+
+// Delete
+message DeleteBackupRequest {
+  string id = 1;
+}
+
+message DeleteBackupResponse {
+  bool success = 1;
+}
+
+// Download raw backup data
+message DownloadBackupRequest {
+  string id = 1;
+}
+
+message DownloadBackupResponse {
+  bytes data = 1;
+  string filename = 2;
+}
+
+// Full platform backup (all modules)
+message CreateFullBackupRequest {
+  repeated ModuleTarget targets = 1;  // portal sends all registered modules
+  optional uint32 tenant_id = 2;
+  string description = 3;
+}
+
+message FullBackupInfo {
+  string id = 1;
+  string description = 2;
+  uint32 tenant_id = 3;
+  bool full_backup = 4;
+  string status = 5;
+  int64 total_size_bytes = 6;
+  repeated BackupInfo module_backups = 7;
+  google.protobuf.Timestamp created_at = 8;
+  string created_by = 9;
+  repeated string errors = 10;
+}
+
+message CreateFullBackupResponse {
+  FullBackupInfo backup = 1;
+}
+
+// Restore full backup
+message RestoreFullBackupRequest {
+  string backup_id = 1;
+  repeated ModuleTarget targets = 2;  // portal sends endpoints for each module
+  RestoreMode mode = 3;
+}
+
+message RestoreFullBackupResponse {
+  bool success = 1;
+  repeated ModuleRestoreResult module_results = 2;
+}
+
+message ModuleRestoreResult {
+  string module_id = 1;
+  bool success = 2;
+  repeated EntityImportResult results = 3;
+  repeated string warnings = 4;
+  string error = 5;
+}
+
+// List full backups
+message ListFullBackupsRequest {
+  optional uint32 tenant_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message ListFullBackupsResponse {
+  repeated FullBackupInfo backups = 1;
+  int32 total = 2;
+}
+
+// Get full backup
+message GetFullBackupRequest {
+  string id = 1;
+}
+
+message GetFullBackupResponse {
+  FullBackupInfo backup = 1;
+}
+
+// Delete full backup
+message DeleteFullBackupRequest {
+  string id = 1;
+}
+
+message DeleteFullBackupResponse {
+  bool success = 1;
+}
+
+service BackupOrchestratorService {
+  // Single module operations
+  rpc CreateModuleBackup(CreateModuleBackupRequest) returns (CreateModuleBackupResponse) {
+    option (google.api.http) = { post: "/v1/backups/modules" body: "*" };
+  }
+  rpc RestoreModuleBackup(RestoreModuleBackupRequest) returns (RestoreModuleBackupResponse) {
+    option (google.api.http) = { post: "/v1/backups/{backup_id}/restore" body: "*" };
+  }
+  rpc ListBackups(ListBackupsRequest) returns (ListBackupsResponse) {
+    option (google.api.http) = { get: "/v1/backups" };
+  }
+  rpc GetBackup(GetBackupRequest) returns (GetBackupResponse) {
+    option (google.api.http) = { get: "/v1/backups/{id}" };
+  }
+  rpc DeleteBackup(DeleteBackupRequest) returns (DeleteBackupResponse) {
+    option (google.api.http) = { delete: "/v1/backups/{id}" };
+  }
+  rpc DownloadBackup(DownloadBackupRequest) returns (DownloadBackupResponse) {
+    option (google.api.http) = { get: "/v1/backups/{id}/download" };
+  }
+
+  // Full platform operations
+  rpc CreateFullBackup(CreateFullBackupRequest) returns (CreateFullBackupResponse) {
+    option (google.api.http) = { post: "/v1/backups/full" body: "*" };
+  }
+  rpc RestoreFullBackup(RestoreFullBackupRequest) returns (RestoreFullBackupResponse) {
+    option (google.api.http) = { post: "/v1/backups/full/{backup_id}/restore" body: "*" };
+  }
+  rpc ListFullBackups(ListFullBackupsRequest) returns (ListFullBackupsResponse) {
+    option (google.api.http) = { get: "/v1/backups/full" };
+  }
+  rpc GetFullBackup(GetFullBackupRequest) returns (GetFullBackupResponse) {
+    option (google.api.http) = { get: "/v1/backups/full/{id}" };
+  }
+  rpc DeleteFullBackup(DeleteFullBackupRequest) returns (DeleteFullBackupResponse) {
+    option (google.api.http) = { delete: "/v1/backups/full/{id}" };
+  }
+}

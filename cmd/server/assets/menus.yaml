@@ -1,0 +1,70 @@
+# Backup Module Menu Definitions
+# This file defines the menu structure for the Backup module
+# Used by admin service for dynamic menu registration
+
+module:
+  id: backup
+  name: Backup
+  description: Centralized backup and restore orchestration for all platform modules
+
+menus:
+  - id: backup
+    parent_id: null
+    type: CATALOG
+    name: Backup
+    path: /backup
+    icon: lucide:archive
+    order: 900
+    authority:
+      - platform:admin
+
+  - id: backup-modules
+    parent_id: backup
+    type: MENU
+    name: Module Backups
+    path: modules
+    component: app/backup/modules/index.vue
+    icon: lucide:database
+    order: 1
+    authority:
+      - platform:admin
+
+  - id: backup-full
+    parent_id: backup
+    type: MENU
+    name: Full Backups
+    path: full
+    component: app/backup/full/index.vue
+    icon: lucide:hard-drive
+    order: 2
+    authority:
+      - platform:admin
+
+permission_groups:
+  - name: Backup
+    module: backup
+    description: Backup Module Permissions
+    permissions:
+      - name: View Backups
+        code: backup.view
+        description: View backup list and details
+      - name: Create Backups
+        code: backup.create
+        description: Create module and full backups
+      - name: Restore Backups
+        code: backup.restore
+        description: Restore backups to modules
+      - name: Delete Backups
+        code: backup.delete
+        description: Delete backup files
+
+roles:
+  - name: Backup Administrator
+    code: backup.admin
+    description: Full access to Backup module
+    is_system: true
+    permissions:
+      - backup.view
+      - backup.create
+      - backup.restore
+      - backup.delete

@@ -1,0 +1,356 @@
+openapi: 3.0.3
+info:
+  title: Backup Orchestrator Service API
+  description: Centralized backup and restore orchestration for all platform modules
+  version: 1.0.0
+
+paths:
+  /v1/backups/modules:
+    post:
+      summary: Create a single module backup
+      operationId: CreateModuleBackup
+      tags: [Module Backups]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateModuleBackupRequest'
+      responses:
+        '200':
+          description: Backup created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateModuleBackupResponse'
+
+  /v1/backups:
+    get:
+      summary: List module backups
+      operationId: ListBackups
+      tags: [Module Backups]
+      parameters:
+        - name: module_id
+          in: query
+          schema: { type: string }
+        - name: tenant_id
+          in: query
+          schema: { type: integer }
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: page_size
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: List of backups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBackupsResponse'
+
+  /v1/backups/{id}:
+    get:
+      summary: Get backup details
+      operationId: GetBackup
+      tags: [Module Backups]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Backup details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBackupResponse'
+    delete:
+      summary: Delete a backup
+      operationId: DeleteBackup
+      tags: [Module Backups]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Backup deleted
+
+  /v1/backups/{id}/download:
+    get:
+      summary: Download backup data
+      operationId: DownloadBackup
+      tags: [Module Backups]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Backup data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadBackupResponse'
+
+  /v1/backups/{backup_id}/restore:
+    post:
+      summary: Restore a module backup
+      operationId: RestoreModuleBackup
+      tags: [Module Backups]
+      parameters:
+        - name: backup_id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreModuleBackupRequest'
+      responses:
+        '200':
+          description: Restore results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreModuleBackupResponse'
+
+  /v1/backups/full:
+    post:
+      summary: Create a full platform backup
+      operationId: CreateFullBackup
+      tags: [Full Backups]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFullBackupRequest'
+      responses:
+        '200':
+          description: Full backup created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFullBackupResponse'
+    get:
+      summary: List full backups
+      operationId: ListFullBackups
+      tags: [Full Backups]
+      parameters:
+        - name: tenant_id
+          in: query
+          schema: { type: integer }
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: page_size
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: List of full backups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFullBackupsResponse'
+
+  /v1/backups/full/{id}:
+    get:
+      summary: Get full backup details
+      operationId: GetFullBackup
+      tags: [Full Backups]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Full backup details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFullBackupResponse'
+    delete:
+      summary: Delete a full backup
+      operationId: DeleteFullBackup
+      tags: [Full Backups]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Full backup deleted
+
+  /v1/backups/full/{backup_id}/restore:
+    post:
+      summary: Restore a full platform backup
+      operationId: RestoreFullBackup
+      tags: [Full Backups]
+      parameters:
+        - name: backup_id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreFullBackupRequest'
+      responses:
+        '200':
+          description: Full restore results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreFullBackupResponse'
+
+components:
+  schemas:
+    ModuleTarget:
+      type: object
+      required: [module_id, grpc_endpoint]
+      properties:
+        module_id: { type: string }
+        grpc_endpoint: { type: string }
+
+    BackupInfo:
+      type: object
+      properties:
+        id: { type: string }
+        module_id: { type: string }
+        description: { type: string }
+        tenant_id: { type: integer }
+        full_backup: { type: boolean }
+        status: { type: string }
+        size_bytes: { type: integer, format: int64 }
+        entity_counts: { type: object, additionalProperties: { type: integer, format: int64 } }
+        created_at: { type: string, format: date-time }
+        created_by: { type: string }
+        version: { type: string }
+        warnings: { type: array, items: { type: string } }
+
+    FullBackupInfo:
+      type: object
+      properties:
+        id: { type: string }
+        description: { type: string }
+        tenant_id: { type: integer }
+        full_backup: { type: boolean }
+        status: { type: string }
+        total_size_bytes: { type: integer, format: int64 }
+        module_backups: { type: array, items: { $ref: '#/components/schemas/BackupInfo' } }
+        created_at: { type: string, format: date-time }
+        created_by: { type: string }
+        errors: { type: array, items: { type: string } }
+
+    EntityImportResult:
+      type: object
+      properties:
+        entity_type: { type: string }
+        total: { type: integer, format: int64 }
+        created: { type: integer, format: int64 }
+        updated: { type: integer, format: int64 }
+        skipped: { type: integer, format: int64 }
+        failed: { type: integer, format: int64 }
+
+    CreateModuleBackupRequest:
+      type: object
+      required: [target]
+      properties:
+        target: { $ref: '#/components/schemas/ModuleTarget' }
+        tenant_id: { type: integer }
+        description: { type: string }
+
+    CreateModuleBackupResponse:
+      type: object
+      properties:
+        backup: { $ref: '#/components/schemas/BackupInfo' }
+
+    RestoreModuleBackupRequest:
+      type: object
+      required: [target, mode]
+      properties:
+        target: { $ref: '#/components/schemas/ModuleTarget' }
+        mode: { type: string, enum: [RESTORE_MODE_SKIP, RESTORE_MODE_OVERWRITE] }
+
+    RestoreModuleBackupResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        results: { type: array, items: { $ref: '#/components/schemas/EntityImportResult' } }
+        warnings: { type: array, items: { type: string } }
+
+    ListBackupsResponse:
+      type: object
+      properties:
+        backups: { type: array, items: { $ref: '#/components/schemas/BackupInfo' } }
+        total: { type: integer }
+
+    GetBackupResponse:
+      type: object
+      properties:
+        backup: { $ref: '#/components/schemas/BackupInfo' }
+
+    DownloadBackupResponse:
+      type: object
+      properties:
+        data: { type: string, format: byte }
+        filename: { type: string }
+
+    CreateFullBackupRequest:
+      type: object
+      required: [targets]
+      properties:
+        targets: { type: array, items: { $ref: '#/components/schemas/ModuleTarget' } }
+        tenant_id: { type: integer }
+        description: { type: string }
+
+    CreateFullBackupResponse:
+      type: object
+      properties:
+        backup: { $ref: '#/components/schemas/FullBackupInfo' }
+
+    RestoreFullBackupRequest:
+      type: object
+      required: [targets, mode]
+      properties:
+        targets: { type: array, items: { $ref: '#/components/schemas/ModuleTarget' } }
+        mode: { type: string, enum: [RESTORE_MODE_SKIP, RESTORE_MODE_OVERWRITE] }
+
+    RestoreFullBackupResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        module_results:
+          type: array
+          items:
+            type: object
+            properties:
+              module_id: { type: string }
+              success: { type: boolean }
+              results: { type: array, items: { $ref: '#/components/schemas/EntityImportResult' } }
+              warnings: { type: array, items: { type: string } }
+              error: { type: string }
+
+    ListFullBackupsResponse:
+      type: object
+      properties:
+        backups: { type: array, items: { $ref: '#/components/schemas/FullBackupInfo' } }
+        total: { type: integer }
+
+    GetFullBackupResponse:
+      type: object
+      properties:
+        backup: { $ref: '#/components/schemas/FullBackupInfo' }
