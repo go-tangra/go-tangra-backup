@@ -29,6 +29,7 @@ const (
 	BackupOrchestratorService_RestoreFullBackup_FullMethodName   = "/backup.service.v1.BackupOrchestratorService/RestoreFullBackup"
 	BackupOrchestratorService_ListFullBackups_FullMethodName     = "/backup.service.v1.BackupOrchestratorService/ListFullBackups"
 	BackupOrchestratorService_GetFullBackup_FullMethodName       = "/backup.service.v1.BackupOrchestratorService/GetFullBackup"
+	BackupOrchestratorService_DownloadFullBackup_FullMethodName  = "/backup.service.v1.BackupOrchestratorService/DownloadFullBackup"
 	BackupOrchestratorService_DeleteFullBackup_FullMethodName    = "/backup.service.v1.BackupOrchestratorService/DeleteFullBackup"
 )
 
@@ -48,6 +49,7 @@ type BackupOrchestratorServiceClient interface {
 	RestoreFullBackup(ctx context.Context, in *RestoreFullBackupRequest, opts ...grpc.CallOption) (*RestoreFullBackupResponse, error)
 	ListFullBackups(ctx context.Context, in *ListFullBackupsRequest, opts ...grpc.CallOption) (*ListFullBackupsResponse, error)
 	GetFullBackup(ctx context.Context, in *GetFullBackupRequest, opts ...grpc.CallOption) (*GetFullBackupResponse, error)
+	DownloadFullBackup(ctx context.Context, in *DownloadFullBackupRequest, opts ...grpc.CallOption) (*DownloadFullBackupResponse, error)
 	DeleteFullBackup(ctx context.Context, in *DeleteFullBackupRequest, opts ...grpc.CallOption) (*DeleteFullBackupResponse, error)
 }
 
@@ -159,6 +161,16 @@ func (c *backupOrchestratorServiceClient) GetFullBackup(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *backupOrchestratorServiceClient) DownloadFullBackup(ctx context.Context, in *DownloadFullBackupRequest, opts ...grpc.CallOption) (*DownloadFullBackupResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DownloadFullBackupResponse)
+	err := c.cc.Invoke(ctx, BackupOrchestratorService_DownloadFullBackup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *backupOrchestratorServiceClient) DeleteFullBackup(ctx context.Context, in *DeleteFullBackupRequest, opts ...grpc.CallOption) (*DeleteFullBackupResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteFullBackupResponse)
@@ -185,6 +197,7 @@ type BackupOrchestratorServiceServer interface {
 	RestoreFullBackup(context.Context, *RestoreFullBackupRequest) (*RestoreFullBackupResponse, error)
 	ListFullBackups(context.Context, *ListFullBackupsRequest) (*ListFullBackupsResponse, error)
 	GetFullBackup(context.Context, *GetFullBackupRequest) (*GetFullBackupResponse, error)
+	DownloadFullBackup(context.Context, *DownloadFullBackupRequest) (*DownloadFullBackupResponse, error)
 	DeleteFullBackup(context.Context, *DeleteFullBackupRequest) (*DeleteFullBackupResponse, error)
 	mustEmbedUnimplementedBackupOrchestratorServiceServer()
 }
@@ -225,6 +238,9 @@ func (UnimplementedBackupOrchestratorServiceServer) ListFullBackups(context.Cont
 }
 func (UnimplementedBackupOrchestratorServiceServer) GetFullBackup(context.Context, *GetFullBackupRequest) (*GetFullBackupResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetFullBackup not implemented")
+}
+func (UnimplementedBackupOrchestratorServiceServer) DownloadFullBackup(context.Context, *DownloadFullBackupRequest) (*DownloadFullBackupResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DownloadFullBackup not implemented")
 }
 func (UnimplementedBackupOrchestratorServiceServer) DeleteFullBackup(context.Context, *DeleteFullBackupRequest) (*DeleteFullBackupResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteFullBackup not implemented")
@@ -431,6 +447,24 @@ func _BackupOrchestratorService_GetFullBackup_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BackupOrchestratorService_DownloadFullBackup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DownloadFullBackupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BackupOrchestratorServiceServer).DownloadFullBackup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BackupOrchestratorService_DownloadFullBackup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BackupOrchestratorServiceServer).DownloadFullBackup(ctx, req.(*DownloadFullBackupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BackupOrchestratorService_DeleteFullBackup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFullBackupRequest)
 	if err := dec(in); err != nil {
@@ -495,6 +529,10 @@ var BackupOrchestratorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFullBackup",
 			Handler:    _BackupOrchestratorService_GetFullBackup_Handler,
+		},
+		{
+			MethodName: "DownloadFullBackup",
+			Handler:    _BackupOrchestratorService_DownloadFullBackup_Handler,
 		},
 		{
 			MethodName: "DeleteFullBackup",

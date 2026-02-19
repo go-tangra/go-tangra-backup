@@ -1644,6 +1644,111 @@ func (x *GetFullBackupResponse) GetBackup() *FullBackupInfo {
 	return nil
 }
 
+// Download full backup (all modules combined)
+type DownloadFullBackupRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // required if backup is encrypted
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownloadFullBackupRequest) Reset() {
+	*x = DownloadFullBackupRequest{}
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownloadFullBackupRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadFullBackupRequest) ProtoMessage() {}
+
+func (x *DownloadFullBackupRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadFullBackupRequest.ProtoReflect.Descriptor instead.
+func (*DownloadFullBackupRequest) Descriptor() ([]byte, []int) {
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *DownloadFullBackupRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DownloadFullBackupRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type DownloadFullBackupResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownloadFullBackupResponse) Reset() {
+	*x = DownloadFullBackupResponse{}
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownloadFullBackupResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadFullBackupResponse) ProtoMessage() {}
+
+func (x *DownloadFullBackupResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadFullBackupResponse.ProtoReflect.Descriptor instead.
+func (*DownloadFullBackupResponse) Descriptor() ([]byte, []int) {
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *DownloadFullBackupResponse) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *DownloadFullBackupResponse) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
 // Delete full backup
 type DeleteFullBackupRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1654,7 +1759,7 @@ type DeleteFullBackupRequest struct {
 
 func (x *DeleteFullBackupRequest) Reset() {
 	*x = DeleteFullBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1666,7 +1771,7 @@ func (x *DeleteFullBackupRequest) String() string {
 func (*DeleteFullBackupRequest) ProtoMessage() {}
 
 func (x *DeleteFullBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1679,7 +1784,7 @@ func (x *DeleteFullBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFullBackupRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFullBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{25}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeleteFullBackupRequest) GetId() string {
@@ -1698,7 +1803,7 @@ type DeleteFullBackupResponse struct {
 
 func (x *DeleteFullBackupResponse) Reset() {
 	*x = DeleteFullBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1710,7 +1815,7 @@ func (x *DeleteFullBackupResponse) String() string {
 func (*DeleteFullBackupResponse) ProtoMessage() {}
 
 func (x *DeleteFullBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1723,7 +1828,7 @@ func (x *DeleteFullBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFullBackupResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFullBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{26}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *DeleteFullBackupResponse) GetSuccess() bool {
@@ -1867,14 +1972,20 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\x14GetFullBackupRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"R\n" +
 	"\x15GetFullBackupResponse\x129\n" +
-	"\x06backup\x18\x01 \x01(\v2!.backup.service.v1.FullBackupInfoR\x06backup\")\n" +
+	"\x06backup\x18\x01 \x01(\v2!.backup.service.v1.FullBackupInfoR\x06backup\"G\n" +
+	"\x19DownloadFullBackupRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"L\n" +
+	"\x1aDownloadFullBackupResponse\x12\x12\n" +
+	"\x04data\x18\x01 \x01(\fR\x04data\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\")\n" +
 	"\x17DeleteFullBackupRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"4\n" +
 	"\x18DeleteFullBackupResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess*@\n" +
 	"\vRestoreMode\x12\x15\n" +
 	"\x11RESTORE_MODE_SKIP\x10\x00\x12\x1a\n" +
-	"\x16RESTORE_MODE_OVERWRITE\x10\x012\x83\f\n" +
+	"\x16RESTORE_MODE_OVERWRITE\x10\x012\xa2\r\n" +
 	"\x19BackupOrchestratorService\x12\x91\x01\n" +
 	"\x12CreateModuleBackup\x12,.backup.service.v1.CreateModuleBackupRequest\x1a-.backup.service.v1.CreateModuleBackupResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/v1/backups/modules\x12\xa0\x01\n" +
 	"\x13RestoreModuleBackup\x12-.backup.service.v1.RestoreModuleBackupRequest\x1a..backup.service.v1.RestoreModuleBackupResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/backups/{backup_id}/restore\x12q\n" +
@@ -1885,7 +1996,8 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\x10CreateFullBackup\x12*.backup.service.v1.CreateFullBackupRequest\x1a+.backup.service.v1.CreateFullBackupResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/backups/full\x12\x9f\x01\n" +
 	"\x11RestoreFullBackup\x12+.backup.service.v1.RestoreFullBackupRequest\x1a,.backup.service.v1.RestoreFullBackupResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/backups/full/{backup_id}/restore\x12\x82\x01\n" +
 	"\x0fListFullBackups\x12).backup.service.v1.ListFullBackupsRequest\x1a*.backup.service.v1.ListFullBackupsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/backups/full\x12\x81\x01\n" +
-	"\rGetFullBackup\x12'.backup.service.v1.GetFullBackupRequest\x1a(.backup.service.v1.GetFullBackupResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/backups/full/{id}\x12\x8a\x01\n" +
+	"\rGetFullBackup\x12'.backup.service.v1.GetFullBackupRequest\x1a(.backup.service.v1.GetFullBackupResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/backups/full/{id}\x12\x9c\x01\n" +
+	"\x12DownloadFullBackup\x12,.backup.service.v1.DownloadFullBackupRequest\x1a-.backup.service.v1.DownloadFullBackupResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/backups/full/{id}/download\x12\x8a\x01\n" +
 	"\x10DeleteFullBackup\x12*.backup.service.v1.DeleteFullBackupRequest\x1a+.backup.service.v1.DeleteFullBackupResponse\"\x1d\x82\xd3\xe4\x93\x02\x17*\x15/v1/backups/full/{id}B\xdf\x01\n" +
 	"\x15com.backup.service.v1B\x17BackupOrchestratorProtoP\x01ZGgithub.com/go-tangra/go-tangra-backup/gen/go/backup/service/v1;backuppb\xa2\x02\x03BSX\xaa\x02\x11Backup.Service.V1\xca\x02\x11Backup\\Service\\V1\xe2\x02\x1dBackup\\Service\\V1\\GPBMetadata\xea\x02\x13Backup::Service::V1b\x06proto3"
 
@@ -1902,7 +2014,7 @@ func file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP() []byte {
 }
 
 var file_backup_service_v1_backup_orchestrator_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_backup_service_v1_backup_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_backup_service_v1_backup_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_backup_service_v1_backup_orchestrator_proto_goTypes = []any{
 	(RestoreMode)(0),                    // 0: backup.service.v1.RestoreMode
 	(*ModuleTarget)(nil),                // 1: backup.service.v1.ModuleTarget
@@ -1930,15 +2042,17 @@ var file_backup_service_v1_backup_orchestrator_proto_goTypes = []any{
 	(*ListFullBackupsResponse)(nil),     // 23: backup.service.v1.ListFullBackupsResponse
 	(*GetFullBackupRequest)(nil),        // 24: backup.service.v1.GetFullBackupRequest
 	(*GetFullBackupResponse)(nil),       // 25: backup.service.v1.GetFullBackupResponse
-	(*DeleteFullBackupRequest)(nil),     // 26: backup.service.v1.DeleteFullBackupRequest
-	(*DeleteFullBackupResponse)(nil),    // 27: backup.service.v1.DeleteFullBackupResponse
-	nil,                                 // 28: backup.service.v1.BackupInfo.EntityCountsEntry
-	(*timestamppb.Timestamp)(nil),       // 29: google.protobuf.Timestamp
+	(*DownloadFullBackupRequest)(nil),   // 26: backup.service.v1.DownloadFullBackupRequest
+	(*DownloadFullBackupResponse)(nil),  // 27: backup.service.v1.DownloadFullBackupResponse
+	(*DeleteFullBackupRequest)(nil),     // 28: backup.service.v1.DeleteFullBackupRequest
+	(*DeleteFullBackupResponse)(nil),    // 29: backup.service.v1.DeleteFullBackupResponse
+	nil,                                 // 30: backup.service.v1.BackupInfo.EntityCountsEntry
+	(*timestamppb.Timestamp)(nil),       // 31: google.protobuf.Timestamp
 }
 var file_backup_service_v1_backup_orchestrator_proto_depIdxs = []int32{
 	1,  // 0: backup.service.v1.CreateModuleBackupRequest.target:type_name -> backup.service.v1.ModuleTarget
-	28, // 1: backup.service.v1.BackupInfo.entity_counts:type_name -> backup.service.v1.BackupInfo.EntityCountsEntry
-	29, // 2: backup.service.v1.BackupInfo.created_at:type_name -> google.protobuf.Timestamp
+	30, // 1: backup.service.v1.BackupInfo.entity_counts:type_name -> backup.service.v1.BackupInfo.EntityCountsEntry
+	31, // 2: backup.service.v1.BackupInfo.created_at:type_name -> google.protobuf.Timestamp
 	3,  // 3: backup.service.v1.CreateModuleBackupResponse.backup:type_name -> backup.service.v1.BackupInfo
 	1,  // 4: backup.service.v1.RestoreModuleBackupRequest.target:type_name -> backup.service.v1.ModuleTarget
 	0,  // 5: backup.service.v1.RestoreModuleBackupRequest.mode:type_name -> backup.service.v1.RestoreMode
@@ -1947,7 +2061,7 @@ var file_backup_service_v1_backup_orchestrator_proto_depIdxs = []int32{
 	3,  // 8: backup.service.v1.GetBackupResponse.backup:type_name -> backup.service.v1.BackupInfo
 	1,  // 9: backup.service.v1.CreateFullBackupRequest.targets:type_name -> backup.service.v1.ModuleTarget
 	3,  // 10: backup.service.v1.FullBackupInfo.module_backups:type_name -> backup.service.v1.BackupInfo
-	29, // 11: backup.service.v1.FullBackupInfo.created_at:type_name -> google.protobuf.Timestamp
+	31, // 11: backup.service.v1.FullBackupInfo.created_at:type_name -> google.protobuf.Timestamp
 	17, // 12: backup.service.v1.CreateFullBackupResponse.backup:type_name -> backup.service.v1.FullBackupInfo
 	1,  // 13: backup.service.v1.RestoreFullBackupRequest.targets:type_name -> backup.service.v1.ModuleTarget
 	0,  // 14: backup.service.v1.RestoreFullBackupRequest.mode:type_name -> backup.service.v1.RestoreMode
@@ -1965,20 +2079,22 @@ var file_backup_service_v1_backup_orchestrator_proto_depIdxs = []int32{
 	19, // 26: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:input_type -> backup.service.v1.RestoreFullBackupRequest
 	22, // 27: backup.service.v1.BackupOrchestratorService.ListFullBackups:input_type -> backup.service.v1.ListFullBackupsRequest
 	24, // 28: backup.service.v1.BackupOrchestratorService.GetFullBackup:input_type -> backup.service.v1.GetFullBackupRequest
-	26, // 29: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:input_type -> backup.service.v1.DeleteFullBackupRequest
-	4,  // 30: backup.service.v1.BackupOrchestratorService.CreateModuleBackup:output_type -> backup.service.v1.CreateModuleBackupResponse
-	6,  // 31: backup.service.v1.BackupOrchestratorService.RestoreModuleBackup:output_type -> backup.service.v1.RestoreModuleBackupResponse
-	9,  // 32: backup.service.v1.BackupOrchestratorService.ListBackups:output_type -> backup.service.v1.ListBackupsResponse
-	11, // 33: backup.service.v1.BackupOrchestratorService.GetBackup:output_type -> backup.service.v1.GetBackupResponse
-	13, // 34: backup.service.v1.BackupOrchestratorService.DeleteBackup:output_type -> backup.service.v1.DeleteBackupResponse
-	15, // 35: backup.service.v1.BackupOrchestratorService.DownloadBackup:output_type -> backup.service.v1.DownloadBackupResponse
-	18, // 36: backup.service.v1.BackupOrchestratorService.CreateFullBackup:output_type -> backup.service.v1.CreateFullBackupResponse
-	20, // 37: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:output_type -> backup.service.v1.RestoreFullBackupResponse
-	23, // 38: backup.service.v1.BackupOrchestratorService.ListFullBackups:output_type -> backup.service.v1.ListFullBackupsResponse
-	25, // 39: backup.service.v1.BackupOrchestratorService.GetFullBackup:output_type -> backup.service.v1.GetFullBackupResponse
-	27, // 40: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:output_type -> backup.service.v1.DeleteFullBackupResponse
-	30, // [30:41] is the sub-list for method output_type
-	19, // [19:30] is the sub-list for method input_type
+	26, // 29: backup.service.v1.BackupOrchestratorService.DownloadFullBackup:input_type -> backup.service.v1.DownloadFullBackupRequest
+	28, // 30: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:input_type -> backup.service.v1.DeleteFullBackupRequest
+	4,  // 31: backup.service.v1.BackupOrchestratorService.CreateModuleBackup:output_type -> backup.service.v1.CreateModuleBackupResponse
+	6,  // 32: backup.service.v1.BackupOrchestratorService.RestoreModuleBackup:output_type -> backup.service.v1.RestoreModuleBackupResponse
+	9,  // 33: backup.service.v1.BackupOrchestratorService.ListBackups:output_type -> backup.service.v1.ListBackupsResponse
+	11, // 34: backup.service.v1.BackupOrchestratorService.GetBackup:output_type -> backup.service.v1.GetBackupResponse
+	13, // 35: backup.service.v1.BackupOrchestratorService.DeleteBackup:output_type -> backup.service.v1.DeleteBackupResponse
+	15, // 36: backup.service.v1.BackupOrchestratorService.DownloadBackup:output_type -> backup.service.v1.DownloadBackupResponse
+	18, // 37: backup.service.v1.BackupOrchestratorService.CreateFullBackup:output_type -> backup.service.v1.CreateFullBackupResponse
+	20, // 38: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:output_type -> backup.service.v1.RestoreFullBackupResponse
+	23, // 39: backup.service.v1.BackupOrchestratorService.ListFullBackups:output_type -> backup.service.v1.ListFullBackupsResponse
+	25, // 40: backup.service.v1.BackupOrchestratorService.GetFullBackup:output_type -> backup.service.v1.GetFullBackupResponse
+	27, // 41: backup.service.v1.BackupOrchestratorService.DownloadFullBackup:output_type -> backup.service.v1.DownloadFullBackupResponse
+	29, // 42: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:output_type -> backup.service.v1.DeleteFullBackupResponse
+	31, // [31:43] is the sub-list for method output_type
+	19, // [19:31] is the sub-list for method input_type
 	19, // [19:19] is the sub-list for extension type_name
 	19, // [19:19] is the sub-list for extension extendee
 	0,  // [0:19] is the sub-list for field type_name
@@ -1999,7 +2115,7 @@ func file_backup_service_v1_backup_orchestrator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_backup_service_v1_backup_orchestrator_proto_rawDesc), len(file_backup_service_v1_backup_orchestrator_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   28,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

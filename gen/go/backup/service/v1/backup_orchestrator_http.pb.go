@@ -24,6 +24,7 @@ const OperationBackupOrchestratorServiceCreateModuleBackup = "/backup.service.v1
 const OperationBackupOrchestratorServiceDeleteBackup = "/backup.service.v1.BackupOrchestratorService/DeleteBackup"
 const OperationBackupOrchestratorServiceDeleteFullBackup = "/backup.service.v1.BackupOrchestratorService/DeleteFullBackup"
 const OperationBackupOrchestratorServiceDownloadBackup = "/backup.service.v1.BackupOrchestratorService/DownloadBackup"
+const OperationBackupOrchestratorServiceDownloadFullBackup = "/backup.service.v1.BackupOrchestratorService/DownloadFullBackup"
 const OperationBackupOrchestratorServiceGetBackup = "/backup.service.v1.BackupOrchestratorService/GetBackup"
 const OperationBackupOrchestratorServiceGetFullBackup = "/backup.service.v1.BackupOrchestratorService/GetFullBackup"
 const OperationBackupOrchestratorServiceListBackups = "/backup.service.v1.BackupOrchestratorService/ListBackups"
@@ -39,6 +40,7 @@ type BackupOrchestratorServiceHTTPServer interface {
 	DeleteBackup(context.Context, *DeleteBackupRequest) (*DeleteBackupResponse, error)
 	DeleteFullBackup(context.Context, *DeleteFullBackupRequest) (*DeleteFullBackupResponse, error)
 	DownloadBackup(context.Context, *DownloadBackupRequest) (*DownloadBackupResponse, error)
+	DownloadFullBackup(context.Context, *DownloadFullBackupRequest) (*DownloadFullBackupResponse, error)
 	GetBackup(context.Context, *GetBackupRequest) (*GetBackupResponse, error)
 	GetFullBackup(context.Context, *GetFullBackupRequest) (*GetFullBackupResponse, error)
 	ListBackups(context.Context, *ListBackupsRequest) (*ListBackupsResponse, error)
@@ -59,6 +61,7 @@ func RegisterBackupOrchestratorServiceHTTPServer(s *http.Server, srv BackupOrche
 	r.POST("/v1/backups/full/{backup_id}/restore", _BackupOrchestratorService_RestoreFullBackup0_HTTP_Handler(srv))
 	r.GET("/v1/backups/full", _BackupOrchestratorService_ListFullBackups0_HTTP_Handler(srv))
 	r.GET("/v1/backups/full/{id}", _BackupOrchestratorService_GetFullBackup0_HTTP_Handler(srv))
+	r.POST("/v1/backups/full/{id}/download", _BackupOrchestratorService_DownloadFullBackup0_HTTP_Handler(srv))
 	r.DELETE("/v1/backups/full/{id}", _BackupOrchestratorService_DeleteFullBackup0_HTTP_Handler(srv))
 }
 
@@ -285,6 +288,31 @@ func _BackupOrchestratorService_GetFullBackup0_HTTP_Handler(srv BackupOrchestrat
 	}
 }
 
+func _BackupOrchestratorService_DownloadFullBackup0_HTTP_Handler(srv BackupOrchestratorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DownloadFullBackupRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationBackupOrchestratorServiceDownloadFullBackup)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DownloadFullBackup(ctx, req.(*DownloadFullBackupRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DownloadFullBackupResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _BackupOrchestratorService_DeleteFullBackup0_HTTP_Handler(srv BackupOrchestratorServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in DeleteFullBackupRequest
@@ -315,6 +343,7 @@ type BackupOrchestratorServiceHTTPClient interface {
 	DeleteBackup(ctx context.Context, req *DeleteBackupRequest, opts ...http.CallOption) (rsp *DeleteBackupResponse, err error)
 	DeleteFullBackup(ctx context.Context, req *DeleteFullBackupRequest, opts ...http.CallOption) (rsp *DeleteFullBackupResponse, err error)
 	DownloadBackup(ctx context.Context, req *DownloadBackupRequest, opts ...http.CallOption) (rsp *DownloadBackupResponse, err error)
+	DownloadFullBackup(ctx context.Context, req *DownloadFullBackupRequest, opts ...http.CallOption) (rsp *DownloadFullBackupResponse, err error)
 	GetBackup(ctx context.Context, req *GetBackupRequest, opts ...http.CallOption) (rsp *GetBackupResponse, err error)
 	GetFullBackup(ctx context.Context, req *GetFullBackupRequest, opts ...http.CallOption) (rsp *GetFullBackupResponse, err error)
 	ListBackups(ctx context.Context, req *ListBackupsRequest, opts ...http.CallOption) (rsp *ListBackupsResponse, err error)
@@ -390,6 +419,19 @@ func (c *BackupOrchestratorServiceHTTPClientImpl) DownloadBackup(ctx context.Con
 	pattern := "/v1/backups/{id}/download"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationBackupOrchestratorServiceDownloadBackup))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *BackupOrchestratorServiceHTTPClientImpl) DownloadFullBackup(ctx context.Context, in *DownloadFullBackupRequest, opts ...http.CallOption) (*DownloadFullBackupResponse, error) {
+	var out DownloadFullBackupResponse
+	pattern := "/v1/backups/full/{id}/download"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationBackupOrchestratorServiceDownloadFullBackup))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

@@ -180,6 +180,17 @@ message GetFullBackupResponse {
   FullBackupInfo backup = 1;
 }
 
+// Download full backup (all modules combined)
+message DownloadFullBackupRequest {
+  string id = 1;
+  string password = 2;            // required if backup is encrypted
+}
+
+message DownloadFullBackupResponse {
+  bytes data = 1;
+  string filename = 2;
+}
+
 // Delete full backup
 message DeleteFullBackupRequest {
   string id = 1;
@@ -222,6 +233,9 @@ service BackupOrchestratorService {
   }
   rpc GetFullBackup(GetFullBackupRequest) returns (GetFullBackupResponse) {
     option (google.api.http) = { get: "/v1/backups/full/{id}" };
+  }
+  rpc DownloadFullBackup(DownloadFullBackupRequest) returns (DownloadFullBackupResponse) {
+    option (google.api.http) = { post: "/v1/backups/full/{id}/download" body: "*" };
   }
   rpc DeleteFullBackup(DeleteFullBackupRequest) returns (DeleteFullBackupResponse) {
     option (google.api.http) = { delete: "/v1/backups/full/{id}" };

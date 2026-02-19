@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -362,6 +363,42 @@ func (s *OrchestratorService) RestoreFullBackup(ctx context.Context, req *backup
 	return &backupV1.RestoreFullBackupResponse{
 		Success:       allSuccess,
 		ModuleResults: moduleResults,
+	}, nil
+}
+
+func (s *OrchestratorService) DownloadFullBackup(ctx context.Context, req *backupV1.DownloadFullBackupRequest) (*backupV1.DownloadFullBackupResponse, error) {
+	info, err := s.storage.GetFullBackup(req.Id)
+	if err != nil {
+		return nil, fmt.Errorf("get full backup metadata: %w", err)
+	}
+
+	if info.Encrypted && req.Password == "" {
+		return nil, fmt.Errorf("backup is encrypted: password required")
+	}
+
+	// Load and combine all completed module data
+	combined := make(map[string]json.RawMessage)
+	for _, mb := range info.ModuleBackups {
+		if mb.Status != "completed" {
+			continue
+		}
+		data, err := s.storage.LoadFullBackupModuleData(req.Id, mb.ModuleId, req.Password)
+		if err != nil {
+			return nil, fmt.Errorf("load module %s data: %w", mb.ModuleId, err)
+		}
+		combined[mb.ModuleId] = json.RawMessage(data)
+	}
+
+	envelope := map[string]any{"modules": combined}
+	out, err := json.MarshalIndent(envelope, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("marshal combined data: %w", err)
+	}
+
+	filename := fmt.Sprintf("full-%s-%s.json", info.Id[:8], info.CreatedAt.AsTime().Format("20060102"))
+	return &backupV1.DownloadFullBackupResponse{
+		Data:     out,
+		Filename: filename,
 	}, nil
 }
 
