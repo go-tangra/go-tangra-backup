@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/backup',
     name: 'Backup',
-    component: () => import('shell/vben/layouts').then((m) => m.BasicLayout),
+    component: () => import('shell/app-layout'),
     redirect: '/backup/modules',
     meta: {
       order: 2090,
