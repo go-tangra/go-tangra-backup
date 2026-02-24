@@ -131,7 +131,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
             <span v-if="target.found" class="text-muted-foreground text-xs">
               {{ target.grpcEndpoint }}
             </span>
-            <span v-else class="text-xs" style="color: #ef4444">
+            <span v-else class="text-xs text-red-500">
               Module not registered
             </span>
           </div>

@@ -1,3 +1,4 @@
+import './styles/tailwind.css';
 import type { TangraModule } from './sdk';
 import routes from './routes';
 import { useBackupModuleStore } from './stores/backup-module.state';

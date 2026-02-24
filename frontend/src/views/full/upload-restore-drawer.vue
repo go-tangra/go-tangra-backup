@@ -257,10 +257,10 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
       <!-- File Info -->
       <div v-else class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-        <LucideFileJson class="size-5" style="color: #3b82f6" />
+        <LucideFileJson class="size-5 text-blue-500" />
         <span class="font-medium">{{ fileName }}</span>
         <button
-          class="ml-auto file-remove-btn"
+          class="ml-auto text-gray-400 hover:text-red-500"
           @click="resetFile"
         >
           <LucideX class="size-4" />
@@ -284,7 +284,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
             <span v-if="target.found" class="text-muted-foreground text-xs">
               {{ target.grpcEndpoint }}
             </span>
-            <span v-else class="text-xs" style="color: #ef4444">
+            <span v-else class="text-xs text-red-500">
               {{ $t('backup.page.full.moduleNotRegistered') }}
             </span>
           </div>
@@ -331,12 +331,3 @@ const [Drawer, drawerApi] = useVbenDrawer({
     </div>
   </Drawer>
 </template>
-
-<style scoped>
-.file-remove-btn {
-  color: #9ca3af;
-}
-.file-remove-btn:hover {
-  color: #ef4444;
-}
-</style>
