@@ -2,6 +2,8 @@ module github.com/go-tangra/go-tangra-backup
 
 go 1.25.4
 
+replace github.com/go-tangra/go-tangra-common => ../go-tangra-common
+
 require (
 	github.com/go-kratos/kratos/v2 v2.9.2
 	github.com/go-tangra/go-tangra-common v0.4.0

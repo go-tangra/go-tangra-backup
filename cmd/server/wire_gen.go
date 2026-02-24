@@ -26,7 +26,8 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	backupStorage := service.NewBackupStorage(context)
 	orchestratorService := service.NewOrchestratorService(context, moduleClient, backupStorage)
 	grpcServer := server.NewGRPCServer(context, certManager, orchestratorService)
-	app := newApp(context, grpcServer)
+	httpServer := server.NewHTTPServer(context)
+	app := newApp(context, grpcServer, httpServer)
 	return app, func() {
 	}, nil
 }
