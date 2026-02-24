@@ -179,6 +179,21 @@ jobs:
         with:
           github_token: ${{ github.token }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@9
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          pnpm install --frozen-lockfile || pnpm install
+          pnpm build
+          cp -r dist/* ../cmd/server/assets/frontend-dist/
+
       - name: Build proto descriptor
         run: buf build -o cmd/server/assets/descriptor.bin --exclude-source-info
 
