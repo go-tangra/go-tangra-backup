@@ -178,20 +178,20 @@ func forwardMetadata(ctx context.Context) context.Context {
 	return grpcMD.NewOutgoingContext(ctx, outMD)
 }
 
-// loadClientTLSCredentials loads mTLS client credentials for calling modules.
+// loadClientTLSCredentials loads mTLS client credentials using convention-based paths:
+//
+//	CA:     {certsDir}/ca/ca.crt
+//	Client: {certsDir}/backup/backup.crt
+//	Key:    {certsDir}/backup/backup.key
 func loadClientTLSCredentials(l *log.Helper) (credentials.TransportCredentials, error) {
-	caCertPath := os.Getenv("BACKUP_CA_CERT_PATH")
-	if caCertPath == "" {
-		caCertPath = "/app/certs/ca/ca.crt"
+	certsDir := os.Getenv("CERTS_DIR")
+	if certsDir == "" {
+		certsDir = "/app/certs"
 	}
-	clientCertPath := os.Getenv("BACKUP_CLIENT_CERT_PATH")
-	if clientCertPath == "" {
-		clientCertPath = "/app/certs/client/client.crt"
-	}
-	clientKeyPath := os.Getenv("BACKUP_CLIENT_KEY_PATH")
-	if clientKeyPath == "" {
-		clientKeyPath = "/app/certs/client/client.key"
-	}
+
+	caCertPath := certsDir + "/ca/ca.crt"
+	clientCertPath := certsDir + "/backup/backup.crt"
+	clientKeyPath := certsDir + "/backup/backup.key"
 
 	caCert, err := os.ReadFile(caCertPath)
 	if err != nil {
