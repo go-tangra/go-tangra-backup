@@ -22,6 +22,7 @@ message ModuleExportResponse {
   google.protobuf.Timestamp exported_at = 4;
   uint32 tenant_id = 5;
   map<string, int64> entity_counts = 6;
+  int32 schema_version = 7;
 }
 
 message ModuleImportRequest {
@@ -33,4 +34,7 @@ message ModuleImportResponse {
   bool success = 1;
   repeated EntityImportResult results = 2;
   repeated string warnings = 3;
+  int32 source_version = 4;
+  int32 target_version = 5;
+  int32 migrations_applied = 6;
 }
