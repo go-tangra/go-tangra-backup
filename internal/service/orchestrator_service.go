@@ -78,8 +78,9 @@ func (s *OrchestratorService) CreateModuleBackup(ctx context.Context, req *backu
 		SizeBytes:    int64(len(result.Data)),
 		EntityCounts: result.EntityCounts,
 		CreatedAt:    timestamppb.New(now),
-		CreatedBy:    username,
-		Version:      result.Version,
+		CreatedBy:     username,
+		Version:       result.Version,
+		SchemaVersion: result.SchemaVersion,
 	}
 
 	if err := s.storage.SaveModuleBackup(info, result.Data, req.Password); err != nil {
@@ -119,11 +120,14 @@ func (s *OrchestratorService) RestoreModuleBackup(ctx context.Context, req *back
 		}
 	}
 
-	s.log.Infof("Module restore completed: backup=%s module=%s", req.BackupId, req.Target.ModuleId)
+	s.log.Infof("Module restore completed: backup=%s module=%s migrations=%d", req.BackupId, req.Target.ModuleId, resp.MigrationsApplied)
 	return &backupV1.RestoreModuleBackupResponse{
-		Success:  resp.Success,
-		Results:  results,
-		Warnings: resp.Warnings,
+		Success:           resp.Success,
+		Results:           results,
+		Warnings:          resp.Warnings,
+		SourceVersion:     resp.SourceVersion,
+		TargetVersion:     resp.TargetVersion,
+		MigrationsApplied: resp.MigrationsApplied,
 	}, nil
 }
 
@@ -245,7 +249,8 @@ func (s *OrchestratorService) CreateFullBackup(ctx context.Context, req *backupV
 			Status:       "completed",
 			SizeBytes:    int64(len(mr.result.Data)),
 			EntityCounts: mr.result.EntityCounts,
-			Version:      mr.result.Version,
+			Version:       mr.result.Version,
+			SchemaVersion: mr.result.SchemaVersion,
 		})
 
 		moduleData[mr.target.ModuleId] = mr.result.Data

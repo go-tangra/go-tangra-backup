@@ -40,6 +40,7 @@ message BackupInfo {
   string version = 11;
   repeated string warnings = 12;
   bool encrypted = 13;
+  int32 schema_version = 14;
 }
 
 message CreateModuleBackupResponse {
@@ -58,6 +59,9 @@ message RestoreModuleBackupResponse {
   bool success = 1;
   repeated EntityImportResult results = 2;
   repeated string warnings = 3;
+  int32 source_version = 4;
+  int32 target_version = 5;
+  int32 migrations_applied = 6;
 }
 
 message EntityImportResult {

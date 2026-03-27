@@ -24,11 +24,12 @@ import (
 
 // ExportResult holds the result of a dynamic ExportBackup call.
 type ExportResult struct {
-	Data         []byte
-	Module       string
-	Version      string
-	TenantID     uint32
-	EntityCounts map[string]int64
+	Data          []byte
+	Module        string
+	Version       string
+	TenantID      uint32
+	EntityCounts  map[string]int64
+	SchemaVersion int32
 }
 
 // ModuleClient connects to any module's BackupService dynamically using raw
@@ -69,11 +70,12 @@ func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.Module
 	}
 
 	return &ExportResult{
-		Data:         resp.Data,
-		Module:       resp.Module,
-		Version:      resp.Version,
-		TenantID:     resp.TenantId,
-		EntityCounts: resp.EntityCounts,
+		Data:          resp.Data,
+		Module:        resp.Module,
+		Version:       resp.Version,
+		TenantID:      resp.TenantId,
+		EntityCounts:  resp.EntityCounts,
+		SchemaVersion: resp.SchemaVersion,
 	}, nil
 }
 

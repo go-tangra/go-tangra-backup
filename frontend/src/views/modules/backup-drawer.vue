@@ -73,6 +73,10 @@ const entityCountEntries = computed(() => {
         <DescriptionsItem :label="$t('backup.page.module.version')">
           {{ backup.version || '-' }}
         </DescriptionsItem>
+        <DescriptionsItem label="Schema Version">
+          <Tag v-if="backup.schemaVersion" color="blue">v{{ backup.schemaVersion }}</Tag>
+          <span v-else>-</span>
+        </DescriptionsItem>
         <DescriptionsItem :label="$t('backup.page.module.tenantId')">
           {{ backup.tenantId }}
         </DescriptionsItem>

@@ -132,6 +132,12 @@ const gridOptions: VxeGridProps<BackupInfo> = {
       width: 80,
     },
     {
+      title: 'Schema',
+      field: 'schemaVersion',
+      width: 70,
+      formatter: ({ cellValue }: any) => cellValue ? `v${cellValue}` : '-',
+    },
+    {
       title: $t('backup.page.module.createdBy'),
       field: 'createdBy',
       width: 120,

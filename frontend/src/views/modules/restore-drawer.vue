@@ -51,8 +51,12 @@ async function handleSubmit() {
       password: formState.value.password || undefined,
     });
     if (resp.success) {
+      const migrationMsg = resp.migrationsApplied
+        ? ` (${resp.migrationsApplied} migration${resp.migrationsApplied > 1 ? 's' : ''} applied: v${resp.sourceVersion} → v${resp.targetVersion})`
+        : '';
       notification.success({
         message: $t('backup.page.module.restoreSuccess'),
+        description: migrationMsg || undefined,
       });
     } else {
       notification.warning({

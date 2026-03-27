@@ -214,6 +214,7 @@ type BackupInfo struct {
 	Version       string                 `protobuf:"bytes,11,opt,name=version,proto3" json:"version,omitempty"`
 	Warnings      []string               `protobuf:"bytes,12,rep,name=warnings,proto3" json:"warnings,omitempty"`
 	Encrypted     bool                   `protobuf:"varint,13,opt,name=encrypted,proto3" json:"encrypted,omitempty"`
+	SchemaVersion int32                  `protobuf:"varint,14,opt,name=schema_version,json=schemaVersion,proto3" json:"schema_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -339,6 +340,13 @@ func (x *BackupInfo) GetEncrypted() bool {
 	return false
 }
 
+func (x *BackupInfo) GetSchemaVersion() int32 {
+	if x != nil {
+		return x.SchemaVersion
+	}
+	return 0
+}
+
 type CreateModuleBackupResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Backup        *BackupInfo            `protobuf:"bytes,1,opt,name=backup,proto3" json:"backup,omitempty"`
@@ -453,12 +461,15 @@ func (x *RestoreModuleBackupRequest) GetPassword() string {
 }
 
 type RestoreModuleBackupResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Results       []*EntityImportResult  `protobuf:"bytes,2,rep,name=results,proto3" json:"results,omitempty"`
-	Warnings      []string               `protobuf:"bytes,3,rep,name=warnings,proto3" json:"warnings,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Success           bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Results           []*EntityImportResult  `protobuf:"bytes,2,rep,name=results,proto3" json:"results,omitempty"`
+	Warnings          []string               `protobuf:"bytes,3,rep,name=warnings,proto3" json:"warnings,omitempty"`
+	SourceVersion     int32                  `protobuf:"varint,4,opt,name=source_version,json=sourceVersion,proto3" json:"source_version,omitempty"`
+	TargetVersion     int32                  `protobuf:"varint,5,opt,name=target_version,json=targetVersion,proto3" json:"target_version,omitempty"`
+	MigrationsApplied int32                  `protobuf:"varint,6,opt,name=migrations_applied,json=migrationsApplied,proto3" json:"migrations_applied,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *RestoreModuleBackupResponse) Reset() {
@@ -510,6 +521,27 @@ func (x *RestoreModuleBackupResponse) GetWarnings() []string {
 		return x.Warnings
 	}
 	return nil
+}
+
+func (x *RestoreModuleBackupResponse) GetSourceVersion() int32 {
+	if x != nil {
+		return x.SourceVersion
+	}
+	return 0
+}
+
+func (x *RestoreModuleBackupResponse) GetTargetVersion() int32 {
+	if x != nil {
+		return x.TargetVersion
+	}
+	return 0
+}
+
+func (x *RestoreModuleBackupResponse) GetMigrationsApplied() int32 {
+	if x != nil {
+		return x.MigrationsApplied
+	}
+	return 0
 }
 
 type EntityImportResult struct {
@@ -1853,7 +1885,7 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\x0finclude_secrets\x18\x04 \x01(\bR\x0eincludeSecrets\x12\x1a\n" +
 	"\bpassword\x18\x05 \x01(\tR\bpasswordB\f\n" +
 	"\n" +
-	"_tenant_id\"\x95\x04\n" +
+	"_tenant_id\"\xbc\x04\n" +
 	"\n" +
 	"BackupInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
@@ -1873,7 +1905,8 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	" \x01(\tR\tcreatedBy\x12\x18\n" +
 	"\aversion\x18\v \x01(\tR\aversion\x12\x1a\n" +
 	"\bwarnings\x18\f \x03(\tR\bwarnings\x12\x1c\n" +
-	"\tencrypted\x18\r \x01(\bR\tencrypted\x1a?\n" +
+	"\tencrypted\x18\r \x01(\bR\tencrypted\x12%\n" +
+	"\x0eschema_version\x18\x0e \x01(\x05R\rschemaVersion\x1a?\n" +
 	"\x11EntityCountsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"S\n" +
@@ -1883,11 +1916,14 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\tbackup_id\x18\x01 \x01(\tR\bbackupId\x127\n" +
 	"\x06target\x18\x02 \x01(\v2\x1f.backup.service.v1.ModuleTargetR\x06target\x122\n" +
 	"\x04mode\x18\x03 \x01(\x0e2\x1e.backup.service.v1.RestoreModeR\x04mode\x12\x1a\n" +
-	"\bpassword\x18\x04 \x01(\tR\bpassword\"\x94\x01\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\"\x91\x02\n" +
 	"\x1bRestoreModuleBackupResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12?\n" +
 	"\aresults\x18\x02 \x03(\v2%.backup.service.v1.EntityImportResultR\aresults\x12\x1a\n" +
-	"\bwarnings\x18\x03 \x03(\tR\bwarnings\"\xb1\x01\n" +
+	"\bwarnings\x18\x03 \x03(\tR\bwarnings\x12%\n" +
+	"\x0esource_version\x18\x04 \x01(\x05R\rsourceVersion\x12%\n" +
+	"\x0etarget_version\x18\x05 \x01(\x05R\rtargetVersion\x12-\n" +
+	"\x12migrations_applied\x18\x06 \x01(\x05R\x11migrationsApplied\"\xb1\x01\n" +
 	"\x12EntityImportResult\x12\x1f\n" +
 	"\ventity_type\x18\x01 \x01(\tR\n" +
 	"entityType\x12\x14\n" +
