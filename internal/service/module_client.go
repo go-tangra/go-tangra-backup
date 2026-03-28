@@ -234,5 +234,25 @@ func loadClientTLSCredentials(l *log.Helper) (credentials.TransportCredentials, 
 		MinVersion:   tls.VersionTLS12,
 	}
 
+	// When MODULE_HOST_OVERRIDE is set, the dial target hostname differs from
+	// the server certificate SAN (e.g., dialing portal.infra.verax.net but cert
+	// has SAN=lcm-service). Skip hostname verification but still validate the
+	// certificate chain against the CA.
+	if os.Getenv("MODULE_HOST_OVERRIDE") != "" {
+		tlsConfig.InsecureSkipVerify = true
+		tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
+			if len(rawCerts) == 0 {
+				return fmt.Errorf("no server certificate presented")
+			}
+			cert, err := x509.ParseCertificate(rawCerts[0])
+			if err != nil {
+				return fmt.Errorf("parse server certificate: %w", err)
+			}
+			// Verify the certificate is signed by our CA (skip hostname check)
+			_, err = cert.Verify(x509.VerifyOptions{Roots: caCertPool})
+			return err
+		}
+	}
+
 	return credentials.NewTLS(tlsConfig), nil
 }
