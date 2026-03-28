@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"sync"
@@ -381,8 +382,9 @@ func (s *OrchestratorService) DownloadFullBackup(ctx context.Context, req *backu
 		return nil, fmt.Errorf("backup is encrypted: password required")
 	}
 
-	// Load and combine all completed module data
-	combined := make(map[string]json.RawMessage)
+	// Load and combine all completed module data.
+	// Module data is gzipped binary, so base64-encode each entry for the JSON envelope.
+	combined := make(map[string]string)
 	for _, mb := range info.ModuleBackups {
 		if mb.Status != "completed" {
 			continue
@@ -391,7 +393,7 @@ func (s *OrchestratorService) DownloadFullBackup(ctx context.Context, req *backu
 		if err != nil {
 			return nil, fmt.Errorf("load module %s data: %w", mb.ModuleId, err)
 		}
-		combined[mb.ModuleId] = json.RawMessage(data)
+		combined[mb.ModuleId] = base64.StdEncoding.EncodeToString(data)
 	}
 
 	envelope := map[string]any{"modules": combined}
