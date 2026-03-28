@@ -167,6 +167,7 @@ func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), er
 		dialOpt,
 		grpc.WithConnectParams(connectParams),
 		grpc.WithKeepaliveParams(keepaliveParams),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(100*1024*1024)), // 100MB for large backups
 	)
 	if err != nil {
 		return nil, func() {}, fmt.Errorf("connect to %s: %w", endpoint, err)
