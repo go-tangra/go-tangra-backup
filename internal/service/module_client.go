@@ -205,14 +205,26 @@ func forwardMetadata(ctx context.Context) context.Context {
 //	Client: {certsDir}/backup/backup.crt
 //	Key:    {certsDir}/backup/backup.key
 func loadClientTLSCredentials(l *log.Helper) (credentials.TransportCredentials, error) {
-	certsDir := os.Getenv("CERTS_DIR")
-	if certsDir == "" {
-		certsDir = "/app/certs"
-	}
+	// Prefer explicit env vars, fall back to convention-based paths
+	caCertPath := os.Getenv("BACKUP_CA_CERT_PATH")
+	clientCertPath := os.Getenv("BACKUP_CLIENT_CERT_PATH")
+	clientKeyPath := os.Getenv("BACKUP_CLIENT_KEY_PATH")
 
-	caCertPath := certsDir + "/ca/ca.crt"
-	clientCertPath := certsDir + "/backup/backup.crt"
-	clientKeyPath := certsDir + "/backup/backup.key"
+	if caCertPath == "" || clientCertPath == "" || clientKeyPath == "" {
+		certsDir := os.Getenv("CERTS_DIR")
+		if certsDir == "" {
+			certsDir = "/app/certs"
+		}
+		if caCertPath == "" {
+			caCertPath = certsDir + "/ca/ca.crt"
+		}
+		if clientCertPath == "" {
+			clientCertPath = certsDir + "/backup/backup.crt"
+		}
+		if clientKeyPath == "" {
+			clientKeyPath = certsDir + "/backup/backup.key"
+		}
+	}
 
 	caCert, err := os.ReadFile(caCertPath)
 	if err != nil {
