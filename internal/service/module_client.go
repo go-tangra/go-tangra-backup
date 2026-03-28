@@ -107,15 +107,34 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 	return resp, nil
 }
 
+// resolveEndpoint replaces the hostname in a module endpoint if
+// MODULE_HOST_OVERRIDE is set. This is needed when the backup service runs
+// outside Docker and can't resolve Docker-internal hostnames like
+// "lcm-service:9100". The override replaces only the host, keeping the port.
+// Example: MODULE_HOST_OVERRIDE=portal.infra.verax.net
+//
+//	"lcm-service:9100" → "portal.infra.verax.net:9100"
+func resolveEndpoint(endpoint string) string {
+	override := os.Getenv("MODULE_HOST_OVERRIDE")
+	if override == "" {
+		return endpoint
+	}
+	parts := strings.SplitN(endpoint, ":", 2)
+	if len(parts) == 2 {
+		return override + ":" + parts[1]
+	}
+	return override
+}
+
 // dialModule establishes a gRPC connection to a module endpoint.
 func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), error) {
-	c.log.Infof("dialModule: raw endpoint=%q", endpoint)
+	endpoint = resolveEndpoint(endpoint)
+	c.log.Infof("dialModule: endpoint=%q", endpoint)
 
 	// grpc.NewClient requires a URI scheme; passthrough lets the OS handle DNS
 	if !strings.Contains(endpoint, "://") {
 		endpoint = "passthrough:///" + endpoint
 	}
-	c.log.Infof("dialModule: resolved target=%q", endpoint)
 
 	var dialOpt grpc.DialOption
 	creds, err := loadClientTLSCredentials(c.log)
