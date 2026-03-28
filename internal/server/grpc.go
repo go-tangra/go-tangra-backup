@@ -9,6 +9,8 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
+	rawGrpc "google.golang.org/grpc"
+
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
@@ -96,6 +98,13 @@ func NewGRPCServer(
 	ms = append(ms, validate.Validator())
 
 	opts = append(opts, grpc.Middleware(ms...))
+
+	// Allow large backup payloads (100MB)
+	maxMsgSize := 100 * 1024 * 1024
+	opts = append(opts, grpc.Options(
+		rawGrpc.MaxRecvMsgSize(maxMsgSize),
+		rawGrpc.MaxSendMsgSize(maxMsgSize),
+	))
 
 	srv := grpc.NewServer(opts...)
 
