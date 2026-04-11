@@ -4,8 +4,6 @@ package backup.service.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/go-tangra/go-tangra-backup/gen/go/backup/service/v1;backuppb";
-
 // BackupService is the standard interface that every module implements
 // to support export/import of its data. The backup orchestrator calls
 // this service on each module via gRPC.
