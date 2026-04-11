@@ -16,4 +16,5 @@ var ProviderSet = wire.NewSet(
 	service.NewModuleClient,
 	service.NewBackupStorage,
 	service.NewOrchestratorService,
+	service.NewTaskExecutor,
 )

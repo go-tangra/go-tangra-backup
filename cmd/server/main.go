@@ -57,6 +57,9 @@ func newApp(
 		MaxRetries:        60,
 	})
 
+	// Register backup task types with the scheduler (background, with retries)
+	backupService.RegisterTasksWithScheduler(ctx.GetLogger())
+
 	return bootstrap.NewApp(ctx, gs, hs)
 }
 

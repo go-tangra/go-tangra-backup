@@ -20,6 +20,7 @@ import (
 	"github.com/go-tangra/go-tangra-backup/internal/cert"
 	"github.com/go-tangra/go-tangra-backup/internal/service"
 
+	commonV1 "github.com/go-tangra/go-tangra-common/gen/go/common/service/v1"
 	"github.com/go-tangra/go-tangra-common/middleware/audit"
 	"github.com/go-tangra/go-tangra-common/middleware/mtls"
 )
@@ -39,6 +40,7 @@ func NewGRPCServer(
 	ctx *bootstrap.Context,
 	certManager *cert.CertManager,
 	orchestratorSvc *service.OrchestratorService,
+	taskExecutor *service.TaskExecutor,
 ) *grpc.Server {
 	cfg := ctx.GetConfig()
 	l := ctx.NewLoggerHelper("backup/grpc")
@@ -110,6 +112,7 @@ func NewGRPCServer(
 
 	// Register services
 	backupV1.RegisterBackupOrchestratorServiceServer(srv, orchestratorSvc)
+	commonV1.RegisterTaskExecutorServiceServer(srv, taskExecutor)
 
 	return srv
 }
