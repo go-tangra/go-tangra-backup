@@ -2,7 +2,7 @@ syntax = "proto3";
 package backup.service.v1;
 
 import "google/protobuf/timestamp.proto";
-import "backup/service/v1/backup_orchestrator.proto";
+import "backup/service/v1/backup_service.proto";
 
 // Wire-compatible copies of the module backup messages (same field numbers).
 // These are used only as marshaling helpers for dynamic gRPC invocation —

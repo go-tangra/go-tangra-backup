@@ -23,53 +23,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// RestoreMode matches the enum in each module's backup.proto
-type RestoreMode int32
-
-const (
-	RestoreMode_RESTORE_MODE_SKIP      RestoreMode = 0
-	RestoreMode_RESTORE_MODE_OVERWRITE RestoreMode = 1
-)
-
-// Enum value maps for RestoreMode.
-var (
-	RestoreMode_name = map[int32]string{
-		0: "RESTORE_MODE_SKIP",
-		1: "RESTORE_MODE_OVERWRITE",
-	}
-	RestoreMode_value = map[string]int32{
-		"RESTORE_MODE_SKIP":      0,
-		"RESTORE_MODE_OVERWRITE": 1,
-	}
-)
-
-func (x RestoreMode) Enum() *RestoreMode {
-	p := new(RestoreMode)
-	*p = x
-	return p
-}
-
-func (x RestoreMode) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (RestoreMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_backup_service_v1_backup_orchestrator_proto_enumTypes[0].Descriptor()
-}
-
-func (RestoreMode) Type() protoreflect.EnumType {
-	return &file_backup_service_v1_backup_orchestrator_proto_enumTypes[0]
-}
-
-func (x RestoreMode) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use RestoreMode.Descriptor instead.
-func (RestoreMode) EnumDescriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{0}
-}
-
 type ModuleTarget struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ModuleId      string                 `protobuf:"bytes,1,opt,name=module_id,json=moduleId,proto3" json:"module_id,omitempty"`             // e.g., "ipam"
@@ -544,90 +497,6 @@ func (x *RestoreModuleBackupResponse) GetMigrationsApplied() int32 {
 	return 0
 }
 
-type EntityImportResult struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	EntityType    string                 `protobuf:"bytes,1,opt,name=entity_type,json=entityType,proto3" json:"entity_type,omitempty"`
-	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	Created       int64                  `protobuf:"varint,3,opt,name=created,proto3" json:"created,omitempty"`
-	Updated       int64                  `protobuf:"varint,4,opt,name=updated,proto3" json:"updated,omitempty"`
-	Skipped       int64                  `protobuf:"varint,5,opt,name=skipped,proto3" json:"skipped,omitempty"`
-	Failed        int64                  `protobuf:"varint,6,opt,name=failed,proto3" json:"failed,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *EntityImportResult) Reset() {
-	*x = EntityImportResult{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EntityImportResult) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EntityImportResult) ProtoMessage() {}
-
-func (x *EntityImportResult) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EntityImportResult.ProtoReflect.Descriptor instead.
-func (*EntityImportResult) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *EntityImportResult) GetEntityType() string {
-	if x != nil {
-		return x.EntityType
-	}
-	return ""
-}
-
-func (x *EntityImportResult) GetTotal() int64 {
-	if x != nil {
-		return x.Total
-	}
-	return 0
-}
-
-func (x *EntityImportResult) GetCreated() int64 {
-	if x != nil {
-		return x.Created
-	}
-	return 0
-}
-
-func (x *EntityImportResult) GetUpdated() int64 {
-	if x != nil {
-		return x.Updated
-	}
-	return 0
-}
-
-func (x *EntityImportResult) GetSkipped() int64 {
-	if x != nil {
-		return x.Skipped
-	}
-	return 0
-}
-
-func (x *EntityImportResult) GetFailed() int64 {
-	if x != nil {
-		return x.Failed
-	}
-	return 0
-}
-
 // List
 type ListBackupsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -641,7 +510,7 @@ type ListBackupsRequest struct {
 
 func (x *ListBackupsRequest) Reset() {
 	*x = ListBackupsRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[7]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -653,7 +522,7 @@ func (x *ListBackupsRequest) String() string {
 func (*ListBackupsRequest) ProtoMessage() {}
 
 func (x *ListBackupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[7]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -666,7 +535,7 @@ func (x *ListBackupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBackupsRequest.ProtoReflect.Descriptor instead.
 func (*ListBackupsRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{7}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListBackupsRequest) GetModuleId() string {
@@ -707,7 +576,7 @@ type ListBackupsResponse struct {
 
 func (x *ListBackupsResponse) Reset() {
 	*x = ListBackupsResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[8]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -719,7 +588,7 @@ func (x *ListBackupsResponse) String() string {
 func (*ListBackupsResponse) ProtoMessage() {}
 
 func (x *ListBackupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[8]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -732,7 +601,7 @@ func (x *ListBackupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBackupsResponse.ProtoReflect.Descriptor instead.
 func (*ListBackupsResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{8}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListBackupsResponse) GetBackups() []*BackupInfo {
@@ -759,7 +628,7 @@ type GetBackupRequest struct {
 
 func (x *GetBackupRequest) Reset() {
 	*x = GetBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[9]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -771,7 +640,7 @@ func (x *GetBackupRequest) String() string {
 func (*GetBackupRequest) ProtoMessage() {}
 
 func (x *GetBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[9]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -784,7 +653,7 @@ func (x *GetBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBackupRequest.ProtoReflect.Descriptor instead.
 func (*GetBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{9}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetBackupRequest) GetId() string {
@@ -803,7 +672,7 @@ type GetBackupResponse struct {
 
 func (x *GetBackupResponse) Reset() {
 	*x = GetBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[10]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -815,7 +684,7 @@ func (x *GetBackupResponse) String() string {
 func (*GetBackupResponse) ProtoMessage() {}
 
 func (x *GetBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[10]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -828,7 +697,7 @@ func (x *GetBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBackupResponse.ProtoReflect.Descriptor instead.
 func (*GetBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{10}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetBackupResponse) GetBackup() *BackupInfo {
@@ -848,7 +717,7 @@ type DeleteBackupRequest struct {
 
 func (x *DeleteBackupRequest) Reset() {
 	*x = DeleteBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[11]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -860,7 +729,7 @@ func (x *DeleteBackupRequest) String() string {
 func (*DeleteBackupRequest) ProtoMessage() {}
 
 func (x *DeleteBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[11]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -873,7 +742,7 @@ func (x *DeleteBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBackupRequest.ProtoReflect.Descriptor instead.
 func (*DeleteBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{11}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeleteBackupRequest) GetId() string {
@@ -892,7 +761,7 @@ type DeleteBackupResponse struct {
 
 func (x *DeleteBackupResponse) Reset() {
 	*x = DeleteBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[12]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -904,7 +773,7 @@ func (x *DeleteBackupResponse) String() string {
 func (*DeleteBackupResponse) ProtoMessage() {}
 
 func (x *DeleteBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[12]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -917,7 +786,7 @@ func (x *DeleteBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBackupResponse.ProtoReflect.Descriptor instead.
 func (*DeleteBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{12}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *DeleteBackupResponse) GetSuccess() bool {
@@ -938,7 +807,7 @@ type DownloadBackupRequest struct {
 
 func (x *DownloadBackupRequest) Reset() {
 	*x = DownloadBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[13]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -950,7 +819,7 @@ func (x *DownloadBackupRequest) String() string {
 func (*DownloadBackupRequest) ProtoMessage() {}
 
 func (x *DownloadBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[13]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -963,7 +832,7 @@ func (x *DownloadBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadBackupRequest.ProtoReflect.Descriptor instead.
 func (*DownloadBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{13}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DownloadBackupRequest) GetId() string {
@@ -990,7 +859,7 @@ type DownloadBackupResponse struct {
 
 func (x *DownloadBackupResponse) Reset() {
 	*x = DownloadBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[14]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1002,7 +871,7 @@ func (x *DownloadBackupResponse) String() string {
 func (*DownloadBackupResponse) ProtoMessage() {}
 
 func (x *DownloadBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[14]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1015,7 +884,7 @@ func (x *DownloadBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadBackupResponse.ProtoReflect.Descriptor instead.
 func (*DownloadBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{14}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *DownloadBackupResponse) GetData() []byte {
@@ -1046,7 +915,7 @@ type CreateFullBackupRequest struct {
 
 func (x *CreateFullBackupRequest) Reset() {
 	*x = CreateFullBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[15]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1058,7 +927,7 @@ func (x *CreateFullBackupRequest) String() string {
 func (*CreateFullBackupRequest) ProtoMessage() {}
 
 func (x *CreateFullBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[15]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1071,7 +940,7 @@ func (x *CreateFullBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFullBackupRequest.ProtoReflect.Descriptor instead.
 func (*CreateFullBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{15}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *CreateFullBackupRequest) GetTargets() []*ModuleTarget {
@@ -1128,7 +997,7 @@ type FullBackupInfo struct {
 
 func (x *FullBackupInfo) Reset() {
 	*x = FullBackupInfo{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[16]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1140,7 +1009,7 @@ func (x *FullBackupInfo) String() string {
 func (*FullBackupInfo) ProtoMessage() {}
 
 func (x *FullBackupInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[16]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1153,7 +1022,7 @@ func (x *FullBackupInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FullBackupInfo.ProtoReflect.Descriptor instead.
 func (*FullBackupInfo) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{16}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *FullBackupInfo) GetId() string {
@@ -1242,7 +1111,7 @@ type CreateFullBackupResponse struct {
 
 func (x *CreateFullBackupResponse) Reset() {
 	*x = CreateFullBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[17]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1254,7 +1123,7 @@ func (x *CreateFullBackupResponse) String() string {
 func (*CreateFullBackupResponse) ProtoMessage() {}
 
 func (x *CreateFullBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[17]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1267,7 +1136,7 @@ func (x *CreateFullBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFullBackupResponse.ProtoReflect.Descriptor instead.
 func (*CreateFullBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{17}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreateFullBackupResponse) GetBackup() *FullBackupInfo {
@@ -1290,7 +1159,7 @@ type RestoreFullBackupRequest struct {
 
 func (x *RestoreFullBackupRequest) Reset() {
 	*x = RestoreFullBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[18]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1302,7 +1171,7 @@ func (x *RestoreFullBackupRequest) String() string {
 func (*RestoreFullBackupRequest) ProtoMessage() {}
 
 func (x *RestoreFullBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[18]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1315,7 +1184,7 @@ func (x *RestoreFullBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestoreFullBackupRequest.ProtoReflect.Descriptor instead.
 func (*RestoreFullBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{18}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RestoreFullBackupRequest) GetBackupId() string {
@@ -1356,7 +1225,7 @@ type RestoreFullBackupResponse struct {
 
 func (x *RestoreFullBackupResponse) Reset() {
 	*x = RestoreFullBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[19]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1368,7 +1237,7 @@ func (x *RestoreFullBackupResponse) String() string {
 func (*RestoreFullBackupResponse) ProtoMessage() {}
 
 func (x *RestoreFullBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[19]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1381,7 +1250,7 @@ func (x *RestoreFullBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestoreFullBackupResponse.ProtoReflect.Descriptor instead.
 func (*RestoreFullBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{19}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *RestoreFullBackupResponse) GetSuccess() bool {
@@ -1411,7 +1280,7 @@ type ModuleRestoreResult struct {
 
 func (x *ModuleRestoreResult) Reset() {
 	*x = ModuleRestoreResult{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[20]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1423,7 +1292,7 @@ func (x *ModuleRestoreResult) String() string {
 func (*ModuleRestoreResult) ProtoMessage() {}
 
 func (x *ModuleRestoreResult) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[20]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1436,7 +1305,7 @@ func (x *ModuleRestoreResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleRestoreResult.ProtoReflect.Descriptor instead.
 func (*ModuleRestoreResult) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{20}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ModuleRestoreResult) GetModuleId() string {
@@ -1486,7 +1355,7 @@ type ListFullBackupsRequest struct {
 
 func (x *ListFullBackupsRequest) Reset() {
 	*x = ListFullBackupsRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[21]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1498,7 +1367,7 @@ func (x *ListFullBackupsRequest) String() string {
 func (*ListFullBackupsRequest) ProtoMessage() {}
 
 func (x *ListFullBackupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[21]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1511,7 +1380,7 @@ func (x *ListFullBackupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFullBackupsRequest.ProtoReflect.Descriptor instead.
 func (*ListFullBackupsRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{21}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListFullBackupsRequest) GetTenantId() uint32 {
@@ -1545,7 +1414,7 @@ type ListFullBackupsResponse struct {
 
 func (x *ListFullBackupsResponse) Reset() {
 	*x = ListFullBackupsResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[22]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1557,7 +1426,7 @@ func (x *ListFullBackupsResponse) String() string {
 func (*ListFullBackupsResponse) ProtoMessage() {}
 
 func (x *ListFullBackupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[22]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1570,7 +1439,7 @@ func (x *ListFullBackupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFullBackupsResponse.ProtoReflect.Descriptor instead.
 func (*ListFullBackupsResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{22}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ListFullBackupsResponse) GetBackups() []*FullBackupInfo {
@@ -1597,7 +1466,7 @@ type GetFullBackupRequest struct {
 
 func (x *GetFullBackupRequest) Reset() {
 	*x = GetFullBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[23]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1609,7 +1478,7 @@ func (x *GetFullBackupRequest) String() string {
 func (*GetFullBackupRequest) ProtoMessage() {}
 
 func (x *GetFullBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[23]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1622,7 +1491,7 @@ func (x *GetFullBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFullBackupRequest.ProtoReflect.Descriptor instead.
 func (*GetFullBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{23}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetFullBackupRequest) GetId() string {
@@ -1641,7 +1510,7 @@ type GetFullBackupResponse struct {
 
 func (x *GetFullBackupResponse) Reset() {
 	*x = GetFullBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[24]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1653,7 +1522,7 @@ func (x *GetFullBackupResponse) String() string {
 func (*GetFullBackupResponse) ProtoMessage() {}
 
 func (x *GetFullBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[24]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1666,7 +1535,7 @@ func (x *GetFullBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFullBackupResponse.ProtoReflect.Descriptor instead.
 func (*GetFullBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{24}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetFullBackupResponse) GetBackup() *FullBackupInfo {
@@ -1687,7 +1556,7 @@ type DownloadFullBackupRequest struct {
 
 func (x *DownloadFullBackupRequest) Reset() {
 	*x = DownloadFullBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1699,7 +1568,7 @@ func (x *DownloadFullBackupRequest) String() string {
 func (*DownloadFullBackupRequest) ProtoMessage() {}
 
 func (x *DownloadFullBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1712,7 +1581,7 @@ func (x *DownloadFullBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadFullBackupRequest.ProtoReflect.Descriptor instead.
 func (*DownloadFullBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{25}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DownloadFullBackupRequest) GetId() string {
@@ -1739,7 +1608,7 @@ type DownloadFullBackupResponse struct {
 
 func (x *DownloadFullBackupResponse) Reset() {
 	*x = DownloadFullBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1751,7 +1620,7 @@ func (x *DownloadFullBackupResponse) String() string {
 func (*DownloadFullBackupResponse) ProtoMessage() {}
 
 func (x *DownloadFullBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1764,7 +1633,7 @@ func (x *DownloadFullBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadFullBackupResponse.ProtoReflect.Descriptor instead.
 func (*DownloadFullBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{26}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *DownloadFullBackupResponse) GetData() []byte {
@@ -1791,7 +1660,7 @@ type DeleteFullBackupRequest struct {
 
 func (x *DeleteFullBackupRequest) Reset() {
 	*x = DeleteFullBackupRequest{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[27]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1803,7 +1672,7 @@ func (x *DeleteFullBackupRequest) String() string {
 func (*DeleteFullBackupRequest) ProtoMessage() {}
 
 func (x *DeleteFullBackupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[27]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1816,7 +1685,7 @@ func (x *DeleteFullBackupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFullBackupRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFullBackupRequest) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{27}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DeleteFullBackupRequest) GetId() string {
@@ -1835,7 +1704,7 @@ type DeleteFullBackupResponse struct {
 
 func (x *DeleteFullBackupResponse) Reset() {
 	*x = DeleteFullBackupResponse{}
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[28]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1847,7 +1716,7 @@ func (x *DeleteFullBackupResponse) String() string {
 func (*DeleteFullBackupResponse) ProtoMessage() {}
 
 func (x *DeleteFullBackupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[28]
+	mi := &file_backup_service_v1_backup_orchestrator_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1860,7 +1729,7 @@ func (x *DeleteFullBackupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFullBackupResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFullBackupResponse) Descriptor() ([]byte, []int) {
-	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{28}
+	return file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeleteFullBackupResponse) GetSuccess() bool {
@@ -1874,7 +1743,7 @@ var File_backup_service_v1_backup_orchestrator_proto protoreflect.FileDescriptor
 
 const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\n" +
-	"+backup/service/v1/backup_orchestrator.proto\x12\x11backup.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"P\n" +
+	"+backup/service/v1/backup_orchestrator.proto\x12\x11backup.service.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a&backup/service/v1/backup_service.proto\"P\n" +
 	"\fModuleTarget\x12\x1b\n" +
 	"\tmodule_id\x18\x01 \x01(\tR\bmoduleId\x12#\n" +
 	"\rgrpc_endpoint\x18\x02 \x01(\tR\fgrpcEndpoint\"\xeb\x01\n" +
@@ -1923,15 +1792,7 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\bwarnings\x18\x03 \x03(\tR\bwarnings\x12%\n" +
 	"\x0esource_version\x18\x04 \x01(\x05R\rsourceVersion\x12%\n" +
 	"\x0etarget_version\x18\x05 \x01(\x05R\rtargetVersion\x12-\n" +
-	"\x12migrations_applied\x18\x06 \x01(\x05R\x11migrationsApplied\"\xb1\x01\n" +
-	"\x12EntityImportResult\x12\x1f\n" +
-	"\ventity_type\x18\x01 \x01(\tR\n" +
-	"entityType\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05total\x12\x18\n" +
-	"\acreated\x18\x03 \x01(\x03R\acreated\x12\x18\n" +
-	"\aupdated\x18\x04 \x01(\x03R\aupdated\x12\x18\n" +
-	"\askipped\x18\x05 \x01(\x03R\askipped\x12\x16\n" +
-	"\x06failed\x18\x06 \x01(\x03R\x06failed\"\x92\x01\n" +
+	"\x12migrations_applied\x18\x06 \x01(\x05R\x11migrationsApplied\"\x92\x01\n" +
 	"\x12ListBackupsRequest\x12\x1b\n" +
 	"\tmodule_id\x18\x01 \x01(\tR\bmoduleId\x12 \n" +
 	"\ttenant_id\x18\x02 \x01(\rH\x00R\btenantId\x88\x01\x01\x12\x12\n" +
@@ -2018,10 +1879,7 @@ const file_backup_service_v1_backup_orchestrator_proto_rawDesc = "" +
 	"\x17DeleteFullBackupRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"4\n" +
 	"\x18DeleteFullBackupResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess*@\n" +
-	"\vRestoreMode\x12\x15\n" +
-	"\x11RESTORE_MODE_SKIP\x10\x00\x12\x1a\n" +
-	"\x16RESTORE_MODE_OVERWRITE\x10\x012\xa2\r\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xa2\r\n" +
 	"\x19BackupOrchestratorService\x12\x91\x01\n" +
 	"\x12CreateModuleBackup\x12,.backup.service.v1.CreateModuleBackupRequest\x1a-.backup.service.v1.CreateModuleBackupResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/v1/backups/modules\x12\xa0\x01\n" +
 	"\x13RestoreModuleBackup\x12-.backup.service.v1.RestoreModuleBackupRequest\x1a..backup.service.v1.RestoreModuleBackupResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/backups/{backup_id}/restore\x12q\n" +
@@ -2049,86 +1907,85 @@ func file_backup_service_v1_backup_orchestrator_proto_rawDescGZIP() []byte {
 	return file_backup_service_v1_backup_orchestrator_proto_rawDescData
 }
 
-var file_backup_service_v1_backup_orchestrator_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_backup_service_v1_backup_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_backup_service_v1_backup_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_backup_service_v1_backup_orchestrator_proto_goTypes = []any{
-	(RestoreMode)(0),                    // 0: backup.service.v1.RestoreMode
-	(*ModuleTarget)(nil),                // 1: backup.service.v1.ModuleTarget
-	(*CreateModuleBackupRequest)(nil),   // 2: backup.service.v1.CreateModuleBackupRequest
-	(*BackupInfo)(nil),                  // 3: backup.service.v1.BackupInfo
-	(*CreateModuleBackupResponse)(nil),  // 4: backup.service.v1.CreateModuleBackupResponse
-	(*RestoreModuleBackupRequest)(nil),  // 5: backup.service.v1.RestoreModuleBackupRequest
-	(*RestoreModuleBackupResponse)(nil), // 6: backup.service.v1.RestoreModuleBackupResponse
-	(*EntityImportResult)(nil),          // 7: backup.service.v1.EntityImportResult
-	(*ListBackupsRequest)(nil),          // 8: backup.service.v1.ListBackupsRequest
-	(*ListBackupsResponse)(nil),         // 9: backup.service.v1.ListBackupsResponse
-	(*GetBackupRequest)(nil),            // 10: backup.service.v1.GetBackupRequest
-	(*GetBackupResponse)(nil),           // 11: backup.service.v1.GetBackupResponse
-	(*DeleteBackupRequest)(nil),         // 12: backup.service.v1.DeleteBackupRequest
-	(*DeleteBackupResponse)(nil),        // 13: backup.service.v1.DeleteBackupResponse
-	(*DownloadBackupRequest)(nil),       // 14: backup.service.v1.DownloadBackupRequest
-	(*DownloadBackupResponse)(nil),      // 15: backup.service.v1.DownloadBackupResponse
-	(*CreateFullBackupRequest)(nil),     // 16: backup.service.v1.CreateFullBackupRequest
-	(*FullBackupInfo)(nil),              // 17: backup.service.v1.FullBackupInfo
-	(*CreateFullBackupResponse)(nil),    // 18: backup.service.v1.CreateFullBackupResponse
-	(*RestoreFullBackupRequest)(nil),    // 19: backup.service.v1.RestoreFullBackupRequest
-	(*RestoreFullBackupResponse)(nil),   // 20: backup.service.v1.RestoreFullBackupResponse
-	(*ModuleRestoreResult)(nil),         // 21: backup.service.v1.ModuleRestoreResult
-	(*ListFullBackupsRequest)(nil),      // 22: backup.service.v1.ListFullBackupsRequest
-	(*ListFullBackupsResponse)(nil),     // 23: backup.service.v1.ListFullBackupsResponse
-	(*GetFullBackupRequest)(nil),        // 24: backup.service.v1.GetFullBackupRequest
-	(*GetFullBackupResponse)(nil),       // 25: backup.service.v1.GetFullBackupResponse
-	(*DownloadFullBackupRequest)(nil),   // 26: backup.service.v1.DownloadFullBackupRequest
-	(*DownloadFullBackupResponse)(nil),  // 27: backup.service.v1.DownloadFullBackupResponse
-	(*DeleteFullBackupRequest)(nil),     // 28: backup.service.v1.DeleteFullBackupRequest
-	(*DeleteFullBackupResponse)(nil),    // 29: backup.service.v1.DeleteFullBackupResponse
-	nil,                                 // 30: backup.service.v1.BackupInfo.EntityCountsEntry
-	(*timestamppb.Timestamp)(nil),       // 31: google.protobuf.Timestamp
+	(*ModuleTarget)(nil),                // 0: backup.service.v1.ModuleTarget
+	(*CreateModuleBackupRequest)(nil),   // 1: backup.service.v1.CreateModuleBackupRequest
+	(*BackupInfo)(nil),                  // 2: backup.service.v1.BackupInfo
+	(*CreateModuleBackupResponse)(nil),  // 3: backup.service.v1.CreateModuleBackupResponse
+	(*RestoreModuleBackupRequest)(nil),  // 4: backup.service.v1.RestoreModuleBackupRequest
+	(*RestoreModuleBackupResponse)(nil), // 5: backup.service.v1.RestoreModuleBackupResponse
+	(*ListBackupsRequest)(nil),          // 6: backup.service.v1.ListBackupsRequest
+	(*ListBackupsResponse)(nil),         // 7: backup.service.v1.ListBackupsResponse
+	(*GetBackupRequest)(nil),            // 8: backup.service.v1.GetBackupRequest
+	(*GetBackupResponse)(nil),           // 9: backup.service.v1.GetBackupResponse
+	(*DeleteBackupRequest)(nil),         // 10: backup.service.v1.DeleteBackupRequest
+	(*DeleteBackupResponse)(nil),        // 11: backup.service.v1.DeleteBackupResponse
+	(*DownloadBackupRequest)(nil),       // 12: backup.service.v1.DownloadBackupRequest
+	(*DownloadBackupResponse)(nil),      // 13: backup.service.v1.DownloadBackupResponse
+	(*CreateFullBackupRequest)(nil),     // 14: backup.service.v1.CreateFullBackupRequest
+	(*FullBackupInfo)(nil),              // 15: backup.service.v1.FullBackupInfo
+	(*CreateFullBackupResponse)(nil),    // 16: backup.service.v1.CreateFullBackupResponse
+	(*RestoreFullBackupRequest)(nil),    // 17: backup.service.v1.RestoreFullBackupRequest
+	(*RestoreFullBackupResponse)(nil),   // 18: backup.service.v1.RestoreFullBackupResponse
+	(*ModuleRestoreResult)(nil),         // 19: backup.service.v1.ModuleRestoreResult
+	(*ListFullBackupsRequest)(nil),      // 20: backup.service.v1.ListFullBackupsRequest
+	(*ListFullBackupsResponse)(nil),     // 21: backup.service.v1.ListFullBackupsResponse
+	(*GetFullBackupRequest)(nil),        // 22: backup.service.v1.GetFullBackupRequest
+	(*GetFullBackupResponse)(nil),       // 23: backup.service.v1.GetFullBackupResponse
+	(*DownloadFullBackupRequest)(nil),   // 24: backup.service.v1.DownloadFullBackupRequest
+	(*DownloadFullBackupResponse)(nil),  // 25: backup.service.v1.DownloadFullBackupResponse
+	(*DeleteFullBackupRequest)(nil),     // 26: backup.service.v1.DeleteFullBackupRequest
+	(*DeleteFullBackupResponse)(nil),    // 27: backup.service.v1.DeleteFullBackupResponse
+	nil,                                 // 28: backup.service.v1.BackupInfo.EntityCountsEntry
+	(*timestamppb.Timestamp)(nil),       // 29: google.protobuf.Timestamp
+	(RestoreMode)(0),                    // 30: backup.service.v1.RestoreMode
+	(*EntityImportResult)(nil),          // 31: backup.service.v1.EntityImportResult
 }
 var file_backup_service_v1_backup_orchestrator_proto_depIdxs = []int32{
-	1,  // 0: backup.service.v1.CreateModuleBackupRequest.target:type_name -> backup.service.v1.ModuleTarget
-	30, // 1: backup.service.v1.BackupInfo.entity_counts:type_name -> backup.service.v1.BackupInfo.EntityCountsEntry
-	31, // 2: backup.service.v1.BackupInfo.created_at:type_name -> google.protobuf.Timestamp
-	3,  // 3: backup.service.v1.CreateModuleBackupResponse.backup:type_name -> backup.service.v1.BackupInfo
-	1,  // 4: backup.service.v1.RestoreModuleBackupRequest.target:type_name -> backup.service.v1.ModuleTarget
-	0,  // 5: backup.service.v1.RestoreModuleBackupRequest.mode:type_name -> backup.service.v1.RestoreMode
-	7,  // 6: backup.service.v1.RestoreModuleBackupResponse.results:type_name -> backup.service.v1.EntityImportResult
-	3,  // 7: backup.service.v1.ListBackupsResponse.backups:type_name -> backup.service.v1.BackupInfo
-	3,  // 8: backup.service.v1.GetBackupResponse.backup:type_name -> backup.service.v1.BackupInfo
-	1,  // 9: backup.service.v1.CreateFullBackupRequest.targets:type_name -> backup.service.v1.ModuleTarget
-	3,  // 10: backup.service.v1.FullBackupInfo.module_backups:type_name -> backup.service.v1.BackupInfo
-	31, // 11: backup.service.v1.FullBackupInfo.created_at:type_name -> google.protobuf.Timestamp
-	17, // 12: backup.service.v1.CreateFullBackupResponse.backup:type_name -> backup.service.v1.FullBackupInfo
-	1,  // 13: backup.service.v1.RestoreFullBackupRequest.targets:type_name -> backup.service.v1.ModuleTarget
-	0,  // 14: backup.service.v1.RestoreFullBackupRequest.mode:type_name -> backup.service.v1.RestoreMode
-	21, // 15: backup.service.v1.RestoreFullBackupResponse.module_results:type_name -> backup.service.v1.ModuleRestoreResult
-	7,  // 16: backup.service.v1.ModuleRestoreResult.results:type_name -> backup.service.v1.EntityImportResult
-	17, // 17: backup.service.v1.ListFullBackupsResponse.backups:type_name -> backup.service.v1.FullBackupInfo
-	17, // 18: backup.service.v1.GetFullBackupResponse.backup:type_name -> backup.service.v1.FullBackupInfo
-	2,  // 19: backup.service.v1.BackupOrchestratorService.CreateModuleBackup:input_type -> backup.service.v1.CreateModuleBackupRequest
-	5,  // 20: backup.service.v1.BackupOrchestratorService.RestoreModuleBackup:input_type -> backup.service.v1.RestoreModuleBackupRequest
-	8,  // 21: backup.service.v1.BackupOrchestratorService.ListBackups:input_type -> backup.service.v1.ListBackupsRequest
-	10, // 22: backup.service.v1.BackupOrchestratorService.GetBackup:input_type -> backup.service.v1.GetBackupRequest
-	12, // 23: backup.service.v1.BackupOrchestratorService.DeleteBackup:input_type -> backup.service.v1.DeleteBackupRequest
-	14, // 24: backup.service.v1.BackupOrchestratorService.DownloadBackup:input_type -> backup.service.v1.DownloadBackupRequest
-	16, // 25: backup.service.v1.BackupOrchestratorService.CreateFullBackup:input_type -> backup.service.v1.CreateFullBackupRequest
-	19, // 26: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:input_type -> backup.service.v1.RestoreFullBackupRequest
-	22, // 27: backup.service.v1.BackupOrchestratorService.ListFullBackups:input_type -> backup.service.v1.ListFullBackupsRequest
-	24, // 28: backup.service.v1.BackupOrchestratorService.GetFullBackup:input_type -> backup.service.v1.GetFullBackupRequest
-	26, // 29: backup.service.v1.BackupOrchestratorService.DownloadFullBackup:input_type -> backup.service.v1.DownloadFullBackupRequest
-	28, // 30: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:input_type -> backup.service.v1.DeleteFullBackupRequest
-	4,  // 31: backup.service.v1.BackupOrchestratorService.CreateModuleBackup:output_type -> backup.service.v1.CreateModuleBackupResponse
-	6,  // 32: backup.service.v1.BackupOrchestratorService.RestoreModuleBackup:output_type -> backup.service.v1.RestoreModuleBackupResponse
-	9,  // 33: backup.service.v1.BackupOrchestratorService.ListBackups:output_type -> backup.service.v1.ListBackupsResponse
-	11, // 34: backup.service.v1.BackupOrchestratorService.GetBackup:output_type -> backup.service.v1.GetBackupResponse
-	13, // 35: backup.service.v1.BackupOrchestratorService.DeleteBackup:output_type -> backup.service.v1.DeleteBackupResponse
-	15, // 36: backup.service.v1.BackupOrchestratorService.DownloadBackup:output_type -> backup.service.v1.DownloadBackupResponse
-	18, // 37: backup.service.v1.BackupOrchestratorService.CreateFullBackup:output_type -> backup.service.v1.CreateFullBackupResponse
-	20, // 38: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:output_type -> backup.service.v1.RestoreFullBackupResponse
-	23, // 39: backup.service.v1.BackupOrchestratorService.ListFullBackups:output_type -> backup.service.v1.ListFullBackupsResponse
-	25, // 40: backup.service.v1.BackupOrchestratorService.GetFullBackup:output_type -> backup.service.v1.GetFullBackupResponse
-	27, // 41: backup.service.v1.BackupOrchestratorService.DownloadFullBackup:output_type -> backup.service.v1.DownloadFullBackupResponse
-	29, // 42: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:output_type -> backup.service.v1.DeleteFullBackupResponse
+	0,  // 0: backup.service.v1.CreateModuleBackupRequest.target:type_name -> backup.service.v1.ModuleTarget
+	28, // 1: backup.service.v1.BackupInfo.entity_counts:type_name -> backup.service.v1.BackupInfo.EntityCountsEntry
+	29, // 2: backup.service.v1.BackupInfo.created_at:type_name -> google.protobuf.Timestamp
+	2,  // 3: backup.service.v1.CreateModuleBackupResponse.backup:type_name -> backup.service.v1.BackupInfo
+	0,  // 4: backup.service.v1.RestoreModuleBackupRequest.target:type_name -> backup.service.v1.ModuleTarget
+	30, // 5: backup.service.v1.RestoreModuleBackupRequest.mode:type_name -> backup.service.v1.RestoreMode
+	31, // 6: backup.service.v1.RestoreModuleBackupResponse.results:type_name -> backup.service.v1.EntityImportResult
+	2,  // 7: backup.service.v1.ListBackupsResponse.backups:type_name -> backup.service.v1.BackupInfo
+	2,  // 8: backup.service.v1.GetBackupResponse.backup:type_name -> backup.service.v1.BackupInfo
+	0,  // 9: backup.service.v1.CreateFullBackupRequest.targets:type_name -> backup.service.v1.ModuleTarget
+	2,  // 10: backup.service.v1.FullBackupInfo.module_backups:type_name -> backup.service.v1.BackupInfo
+	29, // 11: backup.service.v1.FullBackupInfo.created_at:type_name -> google.protobuf.Timestamp
+	15, // 12: backup.service.v1.CreateFullBackupResponse.backup:type_name -> backup.service.v1.FullBackupInfo
+	0,  // 13: backup.service.v1.RestoreFullBackupRequest.targets:type_name -> backup.service.v1.ModuleTarget
+	30, // 14: backup.service.v1.RestoreFullBackupRequest.mode:type_name -> backup.service.v1.RestoreMode
+	19, // 15: backup.service.v1.RestoreFullBackupResponse.module_results:type_name -> backup.service.v1.ModuleRestoreResult
+	31, // 16: backup.service.v1.ModuleRestoreResult.results:type_name -> backup.service.v1.EntityImportResult
+	15, // 17: backup.service.v1.ListFullBackupsResponse.backups:type_name -> backup.service.v1.FullBackupInfo
+	15, // 18: backup.service.v1.GetFullBackupResponse.backup:type_name -> backup.service.v1.FullBackupInfo
+	1,  // 19: backup.service.v1.BackupOrchestratorService.CreateModuleBackup:input_type -> backup.service.v1.CreateModuleBackupRequest
+	4,  // 20: backup.service.v1.BackupOrchestratorService.RestoreModuleBackup:input_type -> backup.service.v1.RestoreModuleBackupRequest
+	6,  // 21: backup.service.v1.BackupOrchestratorService.ListBackups:input_type -> backup.service.v1.ListBackupsRequest
+	8,  // 22: backup.service.v1.BackupOrchestratorService.GetBackup:input_type -> backup.service.v1.GetBackupRequest
+	10, // 23: backup.service.v1.BackupOrchestratorService.DeleteBackup:input_type -> backup.service.v1.DeleteBackupRequest
+	12, // 24: backup.service.v1.BackupOrchestratorService.DownloadBackup:input_type -> backup.service.v1.DownloadBackupRequest
+	14, // 25: backup.service.v1.BackupOrchestratorService.CreateFullBackup:input_type -> backup.service.v1.CreateFullBackupRequest
+	17, // 26: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:input_type -> backup.service.v1.RestoreFullBackupRequest
+	20, // 27: backup.service.v1.BackupOrchestratorService.ListFullBackups:input_type -> backup.service.v1.ListFullBackupsRequest
+	22, // 28: backup.service.v1.BackupOrchestratorService.GetFullBackup:input_type -> backup.service.v1.GetFullBackupRequest
+	24, // 29: backup.service.v1.BackupOrchestratorService.DownloadFullBackup:input_type -> backup.service.v1.DownloadFullBackupRequest
+	26, // 30: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:input_type -> backup.service.v1.DeleteFullBackupRequest
+	3,  // 31: backup.service.v1.BackupOrchestratorService.CreateModuleBackup:output_type -> backup.service.v1.CreateModuleBackupResponse
+	5,  // 32: backup.service.v1.BackupOrchestratorService.RestoreModuleBackup:output_type -> backup.service.v1.RestoreModuleBackupResponse
+	7,  // 33: backup.service.v1.BackupOrchestratorService.ListBackups:output_type -> backup.service.v1.ListBackupsResponse
+	9,  // 34: backup.service.v1.BackupOrchestratorService.GetBackup:output_type -> backup.service.v1.GetBackupResponse
+	11, // 35: backup.service.v1.BackupOrchestratorService.DeleteBackup:output_type -> backup.service.v1.DeleteBackupResponse
+	13, // 36: backup.service.v1.BackupOrchestratorService.DownloadBackup:output_type -> backup.service.v1.DownloadBackupResponse
+	16, // 37: backup.service.v1.BackupOrchestratorService.CreateFullBackup:output_type -> backup.service.v1.CreateFullBackupResponse
+	18, // 38: backup.service.v1.BackupOrchestratorService.RestoreFullBackup:output_type -> backup.service.v1.RestoreFullBackupResponse
+	21, // 39: backup.service.v1.BackupOrchestratorService.ListFullBackups:output_type -> backup.service.v1.ListFullBackupsResponse
+	23, // 40: backup.service.v1.BackupOrchestratorService.GetFullBackup:output_type -> backup.service.v1.GetFullBackupResponse
+	25, // 41: backup.service.v1.BackupOrchestratorService.DownloadFullBackup:output_type -> backup.service.v1.DownloadFullBackupResponse
+	27, // 42: backup.service.v1.BackupOrchestratorService.DeleteFullBackup:output_type -> backup.service.v1.DeleteFullBackupResponse
 	31, // [31:43] is the sub-list for method output_type
 	19, // [19:31] is the sub-list for method input_type
 	19, // [19:19] is the sub-list for extension type_name
@@ -2141,23 +1998,23 @@ func file_backup_service_v1_backup_orchestrator_proto_init() {
 	if File_backup_service_v1_backup_orchestrator_proto != nil {
 		return
 	}
+	file_backup_service_v1_backup_service_proto_init()
 	file_backup_service_v1_backup_orchestrator_proto_msgTypes[1].OneofWrappers = []any{}
-	file_backup_service_v1_backup_orchestrator_proto_msgTypes[7].OneofWrappers = []any{}
-	file_backup_service_v1_backup_orchestrator_proto_msgTypes[15].OneofWrappers = []any{}
-	file_backup_service_v1_backup_orchestrator_proto_msgTypes[21].OneofWrappers = []any{}
+	file_backup_service_v1_backup_orchestrator_proto_msgTypes[6].OneofWrappers = []any{}
+	file_backup_service_v1_backup_orchestrator_proto_msgTypes[14].OneofWrappers = []any{}
+	file_backup_service_v1_backup_orchestrator_proto_msgTypes[20].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_backup_service_v1_backup_orchestrator_proto_rawDesc), len(file_backup_service_v1_backup_orchestrator_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   30,
+			NumEnums:      0,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_backup_service_v1_backup_orchestrator_proto_goTypes,
 		DependencyIndexes: file_backup_service_v1_backup_orchestrator_proto_depIdxs,
-		EnumInfos:         file_backup_service_v1_backup_orchestrator_proto_enumTypes,
 		MessageInfos:      file_backup_service_v1_backup_orchestrator_proto_msgTypes,
 	}.Build()
 	File_backup_service_v1_backup_orchestrator_proto = out.File

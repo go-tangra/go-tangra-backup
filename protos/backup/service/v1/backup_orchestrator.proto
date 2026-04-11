@@ -3,12 +3,7 @@ package backup.service.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-
-// RestoreMode matches the enum in each module's backup.proto
-enum RestoreMode {
-  RESTORE_MODE_SKIP = 0;
-  RESTORE_MODE_OVERWRITE = 1;
-}
+import "backup/service/v1/backup_service.proto";
 
 // --- Orchestrator Service (portal calls this) ---
 
@@ -62,15 +57,6 @@ message RestoreModuleBackupResponse {
   int32 source_version = 4;
   int32 target_version = 5;
   int32 migrations_applied = 6;
-}
-
-message EntityImportResult {
-  string entity_type = 1;
-  int64 total = 2;
-  int64 created = 3;
-  int64 updated = 4;
-  int64 skipped = 5;
-  int64 failed = 6;
 }
 
 // List

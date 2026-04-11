@@ -306,7 +306,7 @@ var File_backup_service_v1_module_backup_proto protoreflect.FileDescriptor
 
 const file_backup_service_v1_module_backup_proto_rawDesc = "" +
 	"\n" +
-	"%backup/service/v1/module_backup.proto\x12\x11backup.service.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a+backup/service/v1/backup_orchestrator.proto\"n\n" +
+	"%backup/service/v1/module_backup.proto\x12\x11backup.service.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a&backup/service/v1/backup_service.proto\"n\n" +
 	"\x13ModuleExportRequest\x12 \n" +
 	"\ttenant_id\x18\x01 \x01(\rH\x00R\btenantId\x88\x01\x01\x12'\n" +
 	"\x0finclude_secrets\x18\x02 \x01(\bR\x0eincludeSecretsB\f\n" +
@@ -376,7 +376,7 @@ func file_backup_service_v1_module_backup_proto_init() {
 	if File_backup_service_v1_module_backup_proto != nil {
 		return
 	}
-	file_backup_service_v1_backup_orchestrator_proto_init()
+	file_backup_service_v1_backup_service_proto_init()
 	file_backup_service_v1_module_backup_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

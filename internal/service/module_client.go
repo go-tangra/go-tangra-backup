@@ -53,8 +53,8 @@ func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.Module
 	}
 	defer cleanup()
 
-	// Construct method path dynamically: /{moduleId}.service.v1.BackupService/ExportBackup
-	method := fmt.Sprintf("/%s.service.v1.BackupService/ExportBackup", target.ModuleId)
+	// All modules implement backup.service.v1.BackupService from go-tangra-backup protos
+	method := "/backup.service.v1.BackupService/ExportBackup"
 
 	req := &backupV1.ModuleExportRequest{TenantId: tenantID, IncludeSecrets: includeSecrets}
 	resp := &backupV1.ModuleExportResponse{}
@@ -87,7 +87,7 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 	}
 	defer cleanup()
 
-	method := fmt.Sprintf("/%s.service.v1.BackupService/ImportBackup", target.ModuleId)
+	method := "/backup.service.v1.BackupService/ImportBackup"
 
 	req := &backupV1.ModuleImportRequest{
 		Data: data,
