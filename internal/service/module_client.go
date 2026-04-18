@@ -207,17 +207,29 @@ func (c *ModuleClient) dialModule(endpoint string, useTLS bool) (*grpc.ClientCon
 
 // forwardMetadata builds outgoing gRPC metadata by forwarding relevant headers
 // from the incoming context so the target module sees the caller's auth context.
+// When no incoming metadata exists (e.g., background scheduler tasks), it injects
+// platform admin credentials so backup operations are authorized.
 func forwardMetadata(ctx context.Context) context.Context {
 	outMD := grpcMD.New(map[string]string{
 		"x-md-global-tenant-id": fmt.Sprintf("%d", grpcx.GetTenantIDFromContext(ctx)),
 	})
 
+	hasMetadata := false
 	if inMD, ok := grpcMD.FromIncomingContext(ctx); ok {
 		for _, key := range []string{"x-md-global-user-id", "x-md-global-username", "x-md-global-roles"} {
 			if vals := inMD.Get(key); len(vals) > 0 {
 				outMD.Set(key, vals[0])
+				hasMetadata = true
 			}
 		}
+	}
+
+	// When running as a background task (no incoming metadata), inject platform
+	// admin identity so modules authorize the backup operation.
+	if !hasMetadata {
+		outMD.Set("x-md-global-tenant-id", "0")
+		outMD.Set("x-md-global-roles", "platform:admin")
+		outMD.Set("x-md-global-username", "backup-service")
 	}
 
 	return grpcMD.NewOutgoingContext(ctx, outMD)
