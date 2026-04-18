@@ -47,14 +47,16 @@ func NewModuleClient(ctx *bootstrap.Context) *ModuleClient {
 
 // ExportBackup calls the target module's BackupService.ExportBackup via dynamic gRPC invocation.
 func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.ModuleTarget, tenantID *uint32, includeSecrets bool) (*ExportResult, error) {
-	conn, cleanup, err := c.dialModule(target.GrpcEndpoint)
+	conn, cleanup, err := c.dialModule(target.GrpcEndpoint, target.ModuleId == "lcm")
 	if err != nil {
 		return nil, fmt.Errorf("dial %s at %s: %w", target.ModuleId, target.GrpcEndpoint, err)
 	}
 	defer cleanup()
 
-	// All modules implement backup.service.v1.BackupService from go-tangra-backup protos
-	method := "/backup.service.v1.BackupService/ExportBackup"
+	// Each module registers BackupService under its own proto package namespace
+	// (e.g., ipam.service.v1.BackupService, warden.service.v1.BackupService).
+	// The scheduler is an exception: it uses the shared backup.service.v1 proto.
+	method := fmt.Sprintf("/%s.service.v1.BackupService/ExportBackup", backupServicePackage(target.ModuleId))
 
 	req := &backupV1.ModuleExportRequest{TenantId: tenantID, IncludeSecrets: includeSecrets}
 	resp := &backupV1.ModuleExportResponse{}
@@ -81,13 +83,13 @@ func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.Module
 
 // ImportBackup calls the target module's BackupService.ImportBackup via dynamic gRPC invocation.
 func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.ModuleTarget, data []byte, mode backupV1.RestoreMode) (*backupV1.ModuleImportResponse, error) {
-	conn, cleanup, err := c.dialModule(target.GrpcEndpoint)
+	conn, cleanup, err := c.dialModule(target.GrpcEndpoint, target.ModuleId == "lcm")
 	if err != nil {
 		return nil, fmt.Errorf("dial %s at %s: %w", target.ModuleId, target.GrpcEndpoint, err)
 	}
 	defer cleanup()
 
-	method := "/backup.service.v1.BackupService/ImportBackup"
+	method := fmt.Sprintf("/%s.service.v1.BackupService/ImportBackup", backupServicePackage(target.ModuleId))
 
 	req := &backupV1.ModuleImportRequest{
 		Data: data,
@@ -105,6 +107,16 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 	}
 
 	return resp, nil
+}
+
+// backupServicePackage returns the proto package name for a module's BackupService.
+// Most modules register under their own namespace (e.g., "ipam.service.v1.BackupService"),
+// but the scheduler uses the shared "backup.service.v1.BackupService" proto.
+func backupServicePackage(moduleID string) string {
+	if moduleID == "scheduler" {
+		return "backup"
+	}
+	return moduleID
 }
 
 // resolveEndpoint replaces the hostname in a module endpoint if
@@ -127,7 +139,9 @@ func resolveEndpoint(endpoint string) string {
 }
 
 // dialModule establishes a gRPC connection to a module endpoint.
-func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), error) {
+// When useTLS is true and no mTLS certs are available, it falls back to
+// TLS with InsecureSkipVerify (needed for modules like LCM that always use TLS).
+func (c *ModuleClient) dialModule(endpoint string, useTLS bool) (*grpc.ClientConn, func(), error) {
 	endpoint = resolveEndpoint(endpoint)
 	c.log.Infof("dialModule: endpoint=%q", endpoint)
 
@@ -139,8 +153,17 @@ func (c *ModuleClient) dialModule(endpoint string) (*grpc.ClientConn, func(), er
 	var dialOpt grpc.DialOption
 	creds, err := loadClientTLSCredentials(c.log)
 	if err != nil {
-		c.log.Warnf("dialModule: TLS credentials failed, using insecure: %v", err)
-		dialOpt = grpc.WithTransportCredentials(insecure.NewCredentials())
+		if useTLS {
+			// Some modules (like LCM) always run with TLS even when mTLS certs
+			// aren't available. Use TLS with InsecureSkipVerify as fallback.
+			c.log.Infof("dialModule: using TLS with skip-verify for %s", endpoint)
+			dialOpt = grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+				InsecureSkipVerify: true,
+			}))
+		} else {
+			c.log.Warnf("dialModule: TLS credentials failed, using insecure: %v", err)
+			dialOpt = grpc.WithTransportCredentials(insecure.NewCredentials())
+		}
 	} else {
 		c.log.Infof("dialModule: using mTLS client credentials")
 		dialOpt = grpc.WithTransportCredentials(creds)
