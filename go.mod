@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/go-kratos/kratos/v2 v2.9.2
-	github.com/go-tangra/go-tangra-common v1.16.0
+	github.com/go-tangra/go-tangra-common v1.17.1
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.7.0
 	github.com/tx7do/kratos-bootstrap/api v0.0.34
@@ -75,3 +75,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260120174246-409b4a993575 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+// Phase 1 of the registration rework: pull cert.Ensure() from the
+// sibling clone of go-tangra-common until a release lands.
