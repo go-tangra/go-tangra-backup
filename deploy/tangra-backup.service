@@ -12,25 +12,50 @@ RestartSec=10
 StartLimitIntervalSec=300
 StartLimitBurst=5
 
-# Environment file (create /etc/tangra-backup/env with your values)
+# Environment file (create /etc/tangra-backup/env with your values).
+# At minimum set: ADMIN_GRPC_ENDPOINT, MODULE_BOOTSTRAP_SECRET, LCM_CA_FINGERPRINT.
 EnvironmentFile=-/etc/tangra-backup/env
 
-# Admin service registration
+# ---------------------------------------------------------------------------
+# Registration with admin gateway (registration-rework v3.0.0+)
+# ---------------------------------------------------------------------------
+
+# Admin gateway gRPC endpoint (plaintext :7787 — registration channel).
 Environment=ADMIN_GRPC_ENDPOINT=
+
+# Routable host:port admin uses to dial back into this service.
 Environment=GRPC_ADVERTISE_ADDR=0.0.0.0:10100
-Environment=MODULE_REGISTRATION_SECRET=
+Environment=HTTP_ADVERTISE_ADDR=0.0.0.0:10101
+Environment=FRONTEND_ENTRY_URL=/modules/backup/remoteEntry.js
+
+# Admin's :7787 is plaintext; skip mTLS dial.
+Environment=REGISTRATION_INSECURE=1
+
+# ---------------------------------------------------------------------------
+# Self-signed cert flow against LCM (registration-rework Phase 1)
+# ---------------------------------------------------------------------------
+
+# LCM's bootstrap port. The module dials this with a CSR + secret +
+# fingerprint pin and gets back a signed cert + CA bundle.
+Environment=LCM_BOOTSTRAP_ENDPOINT=lcm.example.local:9101
+
+# Shared bootstrap secret. MUST match LCM's `module_registration_secret`.
+Environment=MODULE_BOOTSTRAP_SECRET=
+
+# Pre-shared SHA-256 fingerprint of LCM's root CA, lowercase hex (64
+# chars). Mandatory pin — no TOFU.
+Environment=LCM_CA_FINGERPRINT=
+
+# Where cert.Ensure persists the issued ca/server/client cert files.
+# Must be writable by the service user.
+Environment=CERTS_DIR=/var/lib/tangra-backup/certs
+
+# ---------------------------------------------------------------------------
+# Module-specific config
+# ---------------------------------------------------------------------------
 
 # Backup storage path
 Environment=BACKUP_STORAGE_PATH=/var/lib/tangra-backup
-
-# mTLS server certs (gRPC server)
-Environment=BACKUP_CA_CERT_PATH=/etc/tangra-backup/certs/ca.crt
-Environment=BACKUP_SERVER_CERT_PATH=/etc/tangra-backup/certs/server.crt
-Environment=BACKUP_SERVER_KEY_PATH=/etc/tangra-backup/certs/server.key
-
-# mTLS client certs (for calling modules)
-Environment=BACKUP_CLIENT_CERT_PATH=/etc/tangra-backup/certs/backup.crt
-Environment=BACKUP_CLIENT_KEY_PATH=/etc/tangra-backup/certs/backup.key
 
 # Security hardening
 NoNewPrivileges=true
@@ -41,7 +66,7 @@ ProtectKernelTunables=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
 
-# Allow read/write to config, certs, and backup data
+# Allow writes to config dir, cert dir, and backup data dir.
 ReadWritePaths=/etc/tangra-backup
 ReadWritePaths=/var/lib/tangra-backup
 
