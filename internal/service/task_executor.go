@@ -79,7 +79,12 @@ func defaultModuleTargets() []*backupV1.ModuleTarget {
 		{"paperless", "paperless-service:9500"},
 		{"sharing", "sharing-service:9600"},
 		{"executor", "executor-service:9800"},
-		{"asset", "asset-service:9900"},
+		// asset-service was historically on :9900 but the deployer
+		// compose now publishes it on :10600 to clear an old sms-gw
+		// port collision. Keep this aligned with go-tangra-docker's
+		// asset-service block — every other module here uses the
+		// same port inside and outside the docker network.
+		{"asset", "asset-service:10600"},
 		{"hr", "hr-service:10200"},
 		{"notification", "notification-service:10300"},
 		{"signing", "signing-service:10400"},
