@@ -1,10 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -13,12 +15,15 @@ import (
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 	grpcMD "google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 
 	backupV1 "github.com/go-tangra/go-tangra-backup/gen/go/backup/service/v1"
+	commonV1 "github.com/go-tangra/go-tangra-common/gen/go/common/service/v1"
 	"github.com/go-tangra/go-tangra-common/grpcx"
 )
 
@@ -45,7 +50,10 @@ func NewModuleClient(ctx *bootstrap.Context) *ModuleClient {
 	}
 }
 
-// ExportBackup calls the target module's BackupService.ExportBackup via dynamic gRPC invocation.
+// ExportBackup obtains a module's backup. It prefers the shared streaming
+// common.service.v1.BackupService (schema-agnostic SQL dump); if the module
+// hasn't migrated to it yet (Unimplemented), it falls back to the legacy unary
+// per-module BackupService. Either way it returns the archive bytes.
 func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.ModuleTarget, tenantID *uint32, includeSecrets bool) (*ExportResult, error) {
 	conn, cleanup, err := c.dialModule(target.GrpcEndpoint, target.ModuleId == "lcm")
 	if err != nil {
@@ -53,24 +61,28 @@ func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.Module
 	}
 	defer cleanup()
 
-	// Each module registers BackupService under its own proto package namespace
-	// (e.g., ipam.service.v1.BackupService, warden.service.v1.BackupService).
-	// The scheduler is an exception: it uses the shared backup.service.v1 proto.
-	method := fmt.Sprintf("/%s.service.v1.BackupService/ExportBackup", backupServicePackage(target.ModuleId))
+	outCtx := forwardMetadata(ctx)
 
+	// Preferred: streaming SQL-dump backup.
+	data, serr := c.exportStreaming(outCtx, conn, includeSecrets)
+	if serr == nil {
+		c.log.Infof("Streamed SQL backup from %s (%d bytes)", target.ModuleId, len(data))
+		return &ExportResult{Data: data, Module: target.ModuleId, TenantID: tenantIDValue(tenantID)}, nil
+	}
+	if status.Code(serr) != codes.Unimplemented {
+		return nil, fmt.Errorf("stream export %s: %w", target.ModuleId, serr)
+	}
+
+	// Fallback: legacy unary per-module BackupService.
+	c.log.Infof("%s has no streaming BackupService; using legacy export", target.ModuleId)
+	method := fmt.Sprintf("/%s.service.v1.BackupService/ExportBackup", backupServicePackage(target.ModuleId))
 	req := &backupV1.ModuleExportRequest{TenantId: tenantID, IncludeSecrets: includeSecrets}
 	resp := &backupV1.ModuleExportResponse{}
-
-	// Forward auth metadata with a per-call timeout
-	outCtx := forwardMetadata(ctx)
-	callCtx, cancel := context.WithTimeout(outCtx, 30*time.Second)
+	callCtx, cancel := context.WithTimeout(outCtx, 60*time.Second)
 	defer cancel()
-
-	c.log.Infof("Calling %s on %s", method, target.GrpcEndpoint)
 	if err := conn.Invoke(callCtx, method, req, resp); err != nil {
 		return nil, fmt.Errorf("invoke ExportBackup on %s: %w", target.ModuleId, err)
 	}
-
 	return &ExportResult{
 		Data:          resp.Data,
 		Module:        resp.Module,
@@ -81,7 +93,33 @@ func (c *ModuleClient) ExportBackup(ctx context.Context, target *backupV1.Module
 	}, nil
 }
 
-// ImportBackup calls the target module's BackupService.ImportBackup via dynamic gRPC invocation.
+// exportStreaming pulls the archive via the streaming common.BackupService and
+// accumulates the chunks. The Unimplemented sentinel (when present) surfaces on
+// the first Recv.
+func (c *ModuleClient) exportStreaming(ctx context.Context, conn *grpc.ClientConn, includeSecrets bool) ([]byte, error) {
+	callCtx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	defer cancel()
+
+	stream, err := commonV1.NewBackupServiceClient(conn).ExportBackup(callCtx, &commonV1.ExportBackupRequest{IncludeSecrets: includeSecrets})
+	if err != nil {
+		return nil, err
+	}
+	var buf bytes.Buffer
+	for {
+		msg, err := stream.Recv()
+		if err == io.EOF {
+			return buf.Bytes(), nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(msg.GetContent())
+	}
+}
+
+// ImportBackup restores a module's backup. It prefers the streaming
+// common.service.v1.BackupService; on Unimplemented it falls back to the legacy
+// unary per-module BackupService.
 func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.ModuleTarget, data []byte, mode backupV1.RestoreMode) (*backupV1.ModuleImportResponse, error) {
 	conn, cleanup, err := c.dialModule(target.GrpcEndpoint, target.ModuleId == "lcm")
 	if err != nil {
@@ -89,24 +127,80 @@ func (c *ModuleClient) ImportBackup(ctx context.Context, target *backupV1.Module
 	}
 	defer cleanup()
 
-	method := fmt.Sprintf("/%s.service.v1.BackupService/ImportBackup", backupServicePackage(target.ModuleId))
-
-	req := &backupV1.ModuleImportRequest{
-		Data: data,
-		Mode: mode,
-	}
-	resp := &backupV1.ModuleImportResponse{}
-
 	outCtx := forwardMetadata(ctx)
+
+	resp, serr := c.importStreaming(outCtx, conn, data, mode)
+	if serr == nil {
+		return resp, nil
+	}
+	if status.Code(serr) != codes.Unimplemented {
+		return nil, fmt.Errorf("stream import %s: %w", target.ModuleId, serr)
+	}
+
+	// Fallback: legacy unary.
+	c.log.Infof("%s has no streaming BackupService; using legacy import", target.ModuleId)
+	method := fmt.Sprintf("/%s.service.v1.BackupService/ImportBackup", backupServicePackage(target.ModuleId))
+	req := &backupV1.ModuleImportRequest{Data: data, Mode: mode}
+	out := &backupV1.ModuleImportResponse{}
 	callCtx, cancel := context.WithTimeout(outCtx, 60*time.Second)
 	defer cancel()
-
-	c.log.Infof("Calling %s on %s", method, target.GrpcEndpoint)
-	if err := conn.Invoke(callCtx, method, req, resp); err != nil {
+	if err := conn.Invoke(callCtx, method, req, out); err != nil {
 		return nil, fmt.Errorf("invoke ImportBackup on %s: %w", target.ModuleId, err)
 	}
+	return out, nil
+}
 
-	return resp, nil
+// importStreaming restores via the streaming common.BackupService: send options,
+// then the archive in chunks, then receive the result. The legacy OVERWRITE/SKIP
+// modes both map to MERGE (live-safe upsert); FULL_SYNC is not yet exposed by the
+// orchestrator API.
+func (c *ModuleClient) importStreaming(ctx context.Context, conn *grpc.ClientConn, data []byte, _ backupV1.RestoreMode) (*backupV1.ModuleImportResponse, error) {
+	callCtx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	defer cancel()
+
+	stream, err := commonV1.NewBackupServiceClient(conn).ImportBackup(callCtx)
+	if err != nil {
+		return nil, err
+	}
+	if err := stream.Send(&commonV1.ImportBackupRequest{
+		Payload: &commonV1.ImportBackupRequest_Options{
+			Options: &commonV1.ImportOptions{Mode: commonV1.RestoreMode_RESTORE_MODE_MERGE},
+		},
+	}); err != nil {
+		return nil, err
+	}
+	const chunk = 256 * 1024
+	for off := 0; off < len(data); {
+		end := off + chunk
+		if end > len(data) {
+			end = len(data)
+		}
+		if err := stream.Send(&commonV1.ImportBackupRequest{
+			Payload: &commonV1.ImportBackupRequest_Content{Content: data[off:end]},
+		}); err != nil {
+			return nil, err
+		}
+		off = end
+	}
+	resp, err := stream.CloseAndRecv()
+	if err != nil {
+		return nil, err
+	}
+
+	out := &backupV1.ModuleImportResponse{Success: resp.GetSuccess(), Warnings: resp.GetWarnings()}
+	for _, t := range resp.GetTables() {
+		out.Results = append(out.Results, &backupV1.EntityImportResult{
+			EntityType: t.GetTable(), Total: t.GetRows(), Updated: t.GetRows(), Skipped: boolToInt(t.GetSkipped()),
+		})
+	}
+	return out, nil
+}
+
+func boolToInt(b bool) int64 {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 // backupServicePackage returns the proto package name for a module's BackupService.
