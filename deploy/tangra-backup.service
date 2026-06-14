@@ -12,50 +12,36 @@ RestartSec=10
 StartLimitIntervalSec=300
 StartLimitBurst=5
 
-# Environment file (create /etc/tangra-backup/env with your values).
-# At minimum set: ADMIN_GRPC_ENDPOINT, MODULE_BOOTSTRAP_SECRET, LCM_CA_FINGERPRINT.
-EnvironmentFile=-/etc/tangra-backup/env
-
 # ---------------------------------------------------------------------------
-# Registration with admin gateway (registration-rework v3.0.0+)
+# Safe defaults. Deployment-specific values come from the EnvironmentFile below,
+# which is listed LAST so it overrides these. We deliberately do NOT set empty
+# placeholders for the required vars here — an empty Environment= would override
+# the EnvironmentFile and is what caused the "LCMEndpoint not set" crash.
 # ---------------------------------------------------------------------------
-
-# Admin gateway gRPC endpoint (plaintext :7787 — registration channel).
-Environment=ADMIN_GRPC_ENDPOINT=
 
 # Routable host:port admin uses to dial back into this service.
 Environment=GRPC_ADVERTISE_ADDR=0.0.0.0:10100
 Environment=HTTP_ADVERTISE_ADDR=0.0.0.0:10101
 Environment=FRONTEND_ENTRY_URL=/modules/backup/remoteEntry.js
 
-# Admin's :7787 is plaintext; skip mTLS dial.
+# Admin's :7787 is plaintext; skip mTLS dial on the registration channel.
 Environment=REGISTRATION_INSECURE=1
 
-# ---------------------------------------------------------------------------
-# Self-signed cert flow against LCM (registration-rework Phase 1)
-# ---------------------------------------------------------------------------
-
-# LCM's bootstrap port. The module dials this with a CSR + secret +
-# fingerprint pin and gets back a signed cert + CA bundle.
-Environment=LCM_BOOTSTRAP_ENDPOINT=lcm.example.local:9101
-
-# Shared bootstrap secret. MUST match LCM's `module_registration_secret`.
-Environment=MODULE_BOOTSTRAP_SECRET=
-
-# Pre-shared SHA-256 fingerprint of LCM's root CA, lowercase hex (64
-# chars). Mandatory pin — no TOFU.
-Environment=LCM_CA_FINGERPRINT=
-
 # Where cert.Ensure persists the issued ca/server/client cert files.
-# Must be writable by the service user.
 Environment=CERTS_DIR=/var/lib/tangra-backup/certs
 
-# ---------------------------------------------------------------------------
-# Module-specific config
-# ---------------------------------------------------------------------------
-
-# Backup storage path
+# Backup storage path.
 Environment=BACKUP_STORAGE_PATH=/var/lib/tangra-backup
+
+# ---------------------------------------------------------------------------
+# REQUIRED deployment values — create /etc/tangra-backup/env (never shipped, so
+# package upgrades never touch it) with at least:
+#   ADMIN_GRPC_ENDPOINT=<admin gateway :7787, routable from this host>
+#   LCM_BOOTSTRAP_ENDPOINT=<LCM bootstrap :9101, routable from this host>
+#   MODULE_BOOTSTRAP_SECRET=<shared secret matching LCM>
+#   LCM_CA_FINGERPRINT=<LCM root CA SHA-256, lowercase hex>
+# Listed last on purpose: values here override the defaults above.
+EnvironmentFile=-/etc/tangra-backup/env
 
 # Security hardening
 NoNewPrivileges=true
